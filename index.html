@@ -210,7 +210,7 @@ nav.tabs .badge{position:absolute;top:2px;inset-inline-end:calc(50% - 22px)}
 <body>
 
 
-<div class="banner"><div class="wrap">نسخة عرض سرية مقدمة لنادي رجال التعاون · صالحة حتى ١٩ ديسمبر ٢٠٢٦ · كل الأسماء والأرقام أمثلة</div></div>
+<div class="banner"><div class="wrap">نسخة عرض سرية مقدمة لنادي رجال التعاون · صالحة حتى ٣١ ديسمبر ٢٠٢٦ · كل الأسماء والأرقام أمثلة</div></div>
 
 <header class="top">
   <div class="wrap">
@@ -1336,7 +1336,7 @@ renderChrome(); render();
 </div>
 <script>
 (function(){
-  var END = new Date('2026-12-19T23:59:59+03:00');
+  var END = new Date('2026-12-31T23:59:59+03:00');
   function check(){ if (new Date() > END) { var e = document.getElementById('expired'); e.hidden = false; e.style.display = 'flex'; } }
   check(); setInterval(check, 60000);
   document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
