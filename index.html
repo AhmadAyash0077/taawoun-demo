@@ -1,0 +1,1346 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest">
+<title>تطبيق التعاون</title>
+<meta name="theme-color" content="#8a1c1c">
+<meta name="apple-mobile-web-app-title" content="التعاون">
+<link rel="icon" type="image/png" href="icons/icon-32.png">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lalezar&family=Tajawal:wght@400;500;700;800&display=swap">
+<style>
+/* Layout: phone-first app shell — club header, swappable screens, bottom tab bar (tabs change with the signed-in role) */
+:root{
+  --orange:#d48d1c; --orange-deep:#b8740f; --red:#ad2323; --on-accent:#ffffff;
+  --bg:#fbf6ee; --surface:#ffffff; --fg:#2a1d10; --muted:#6b5a47; --line:#ecdfcc; --soft:#f5ecdd;
+  --ok:#2e7d4f; --warn:#b36b00; --bad:#ad2323;
+  --display:"Lalezar","Tajawal",system-ui,sans-serif;
+  --body:"Tajawal",system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#17110a; --surface:#221a10; --fg:#f6ecdd; --muted:#bda98f; --line:#3a2d1c; --soft:#2b2115;
+  --ok:#5fc48a; --warn:#f0a83a; --bad:#ff7a6e; color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#17110a; --surface:#221a10; --fg:#f6ecdd; --muted:#bda98f; --line:#3a2d1c; --soft:#2b2115;
+  --ok:#5fc48a; --warn:#f0a83a; --bad:#ff7a6e; color-scheme:dark}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.6;direction:rtl;
+  padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+.wrap{max-width:560px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--display);font-weight:400;margin:0;text-wrap:balance;line-height:1.25}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+
+.banner{background:var(--fg);color:var(--bg);font-size:12px;text-align:center}
+.banner .wrap{padding-block:7px}
+
+header.top{background:linear-gradient(160deg,var(--orange) 0%,var(--orange-deep) 100%);color:var(--on-accent);position:relative;overflow:hidden}
+header.top::after{content:"";position:absolute;inset:auto -40px -60px auto;width:220px;height:220px;border-radius:50%;border:18px solid rgba(255,255,255,.12)}
+.top .wrap{padding-block:16px 20px;display:flex;align-items:center;gap:14px;position:relative;z-index:1}
+.crest-img{width:54px;height:auto;flex:none;filter:drop-shadow(0 2px 6px rgba(0,0,0,.25))}
+.crest{width:56px;height:56px;border-radius:50%;background:#fff;color:var(--red);display:grid;place-items:center;font-family:var(--display);font-size:26px;flex:none;box-shadow:0 0 0 4px rgba(255,255,255,.3)}
+.top h1{font-size:23px}
+.top p{margin:0;opacity:.92;font-size:13px}
+
+main{padding-block:18px}
+section.screen{display:flex;flex-direction:column;gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px}
+.label{font-size:12px;color:var(--muted)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.between{justify-content:space-between}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.num{font-variant-numeric:tabular-nums}
+.who{font-size:12px;font-weight:800;color:var(--red);margin:0}
+
+.hero{background:var(--red);color:var(--on-accent);border:none;position:relative;overflow:hidden}
+.hero h2{font-size:22px}
+.hero p{margin:6px 0 14px;opacity:.94}
+.pitch{position:absolute;inset:0;width:100%;height:100%;opacity:.13;pointer-events:none}
+.btn{border:none;border-radius:99px;padding:10px 18px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;font-size:14px}
+.btn-white{background:#fff;color:var(--red)}
+.btn-orange{background:var(--orange);color:#fff}
+.btn-ghost{background:transparent;border:1.5px solid var(--line);color:var(--fg)}
+.btn-sm{padding:5px 12px;font-size:12px}
+.btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.55;cursor:default}
+
+.stat{display:flex;flex-direction:column;gap:2px}
+.stat b{font-size:24px;font-family:var(--display);font-weight:400;color:var(--orange);line-height:1.2}
+
+.session{display:grid;grid-template-columns:56px 1fr auto;gap:12px;align-items:center;padding-block:10px;border-top:1px solid var(--line)}
+.session:first-child{border-top:none}
+.day{text-align:center;background:var(--soft);border-radius:12px;padding:6px 0;line-height:1.2}
+.day b{display:block;font-size:18px;font-family:var(--display);font-weight:400;color:var(--red)}
+.day span{font-size:11px;color:var(--muted)}
+.chip{font-size:12px;border-radius:99px;padding:2px 10px;font-weight:700;white-space:nowrap;display:inline-block}
+.chip.ok{background:color-mix(in srgb,var(--ok) 15%,transparent);color:var(--ok)}
+.chip.warn{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}
+.chip.bad{background:color-mix(in srgb,var(--bad) 14%,transparent);color:var(--bad)}
+.chip.match{background:color-mix(in srgb,var(--red) 14%,transparent);color:var(--red)}
+
+.player-head{display:flex;gap:14px;align-items:center}
+.avatar{width:52px;height:52px;border-radius:50%;background:var(--orange);color:#fff;display:grid;place-items:center;font-family:var(--display);font-size:22px;flex:none}
+.skill{display:grid;grid-template-columns:84px 1fr 30px;gap:10px;align-items:center;font-size:14px}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(270deg,var(--orange),var(--red));border-radius:99px}
+.dots{display:flex;gap:5px;flex-wrap:wrap}
+.dot{width:24px;height:24px;border-radius:6px;display:grid;place-items:center;font-size:11px;color:#fff;font-weight:700}
+.dot.p{background:var(--ok)} .dot.a{background:var(--bad)} .dot.l{background:var(--warn)}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-left:5px;vertical-align:middle}
+.notif{display:flex;gap:10px;align-items:flex-start;padding-block:9px;border-top:1px solid var(--line);font-size:14px}
+.notif:first-child{border-top:none}
+.notif .ic{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;flex:none;font-weight:800;font-size:13px}
+
+.att{display:flex;justify-content:space-between;align-items:center;padding-block:10px;border-top:1px solid var(--line);gap:10px}
+.att:first-child{border-top:none}
+.seg{display:flex;border:1.5px solid var(--line);border-radius:99px;overflow:hidden;flex:none}
+.seg button{border:none;background:transparent;padding:6px 11px;cursor:pointer;font-size:13px;font-weight:700;color:var(--muted)}
+.seg button[aria-pressed="true"].p{background:var(--ok);color:#fff}
+.seg button[aria-pressed="true"].a{background:var(--bad);color:#fff}
+.seg button[aria-pressed="true"].l{background:var(--warn);color:#fff}
+.rate{display:grid;grid-template-columns:84px 1fr 34px;gap:10px;align-items:center;font-size:14px}
+.rate input{width:100%;accent-color:var(--orange)}
+
+.tbl-wrap{overflow-x:auto}
+table.t{width:100%;border-collapse:collapse;font-size:14px}
+table.t th{font-size:12px;color:var(--muted);font-weight:700;text-align:right;padding:6px 4px;border-bottom:1px solid var(--line)}
+table.t td{padding:9px 4px;border-bottom:1px solid var(--line)}
+table.t tr:last-child td{border-bottom:none}
+.list-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding-block:10px;border-top:1px solid var(--line)}
+.list-row:first-child{border-top:none}
+.list-row > div{min-width:0}
+
+.branch{display:flex;flex-direction:column;gap:10px}
+.branch .row a{flex:1;min-width:120px}
+.phone{direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums;user-select:all}
+
+form{display:flex;flex-direction:column;gap:12px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-weight:700;font-size:14px}
+.field input,.field select{border:1.5px solid var(--line);background:var(--bg);border-radius:12px;padding:10px 12px;width:100%}
+.field input:focus,.field select:focus{border-color:var(--orange);outline:none}
+.toast{background:color-mix(in srgb,var(--ok) 13%,var(--surface));border:1px solid var(--ok);color:var(--fg);border-radius:12px;padding:12px;font-size:14px}
+.err{background:color-mix(in srgb,var(--bad) 12%,var(--surface));border:1px solid var(--bad);color:var(--fg);border-radius:12px;padding:10px 12px;font-size:14px}
+
+.socials{display:flex;gap:8px;flex-wrap:wrap}
+.socials a{flex:1 1 28%;text-align:center;padding:10px;border-radius:12px;background:var(--soft);border:1px solid var(--line);color:var(--fg);text-decoration:none;font-weight:700;font-size:13px}
+
+nav.tabs{position:fixed;inset:auto 0 0 0;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);z-index:20}
+nav.tabs .wrap{display:grid;grid-template-columns:repeat(var(--tabs,4),1fr);padding-block:6px}
+nav.tabs button{background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;cursor:pointer;color:var(--muted);font-size:11px;font-weight:700}
+nav.tabs svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+nav.tabs button[aria-current="page"]{color:var(--orange)}
+.note{font-size:12px;color:var(--muted);text-align:center;margin:0}
+.sessionbar{background:var(--soft);border-bottom:1px solid var(--line);font-size:13px}
+.sessionbar .wrap{padding-block:8px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.sessionbar b{font-weight:800}
+.role-pill{font-size:11px;font-weight:800;border-radius:99px;padding:1px 9px;margin-inline-start:6px;background:var(--orange);color:#fff;vertical-align:middle}
+.role-pill.coach{background:var(--ok)} .role-pill.admin{background:var(--red)} .role-pill.guest{background:var(--muted)}
+.linkbtn{background:none;border:none;color:var(--red);font-weight:800;cursor:pointer;padding:0;font-size:13px;text-decoration:underline}
+.acct{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;text-align:right;background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;cursor:pointer}
+.acct:hover{border-color:var(--orange)}
+.acct .label{display:block}
+.otp{display:flex;gap:8px;direction:ltr;justify-content:center}
+.otp span{width:44px;height:52px;border:1.5px solid var(--orange);border-radius:12px;display:grid;place-items:center;font-size:22px;font-weight:800;background:var(--bg)}
+.perm{display:flex;flex-direction:column;gap:6px;font-size:14px;margin:0;padding:0;list-style:none}
+.perm li{display:flex;gap:8px;align-items:flex-start}
+.perm .y{color:var(--ok);font-weight:800;flex:none} .perm .n{color:var(--bad);font-weight:800;flex:none}
+.kids{display:flex;gap:8px;flex-wrap:wrap}
+.kids button{border:1.5px solid var(--line);background:var(--surface);border-radius:99px;padding:6px 14px;font-weight:700;cursor:pointer;font-size:14px}
+.kids button[aria-pressed="true"]{background:var(--orange);border-color:var(--orange);color:#fff}
+.transfer{background:color-mix(in srgb,var(--orange) 9%,var(--surface));border:1.5px solid var(--orange);border-radius:14px;padding:14px;margin-block:8px;display:flex;flex-direction:column;gap:10px}
+.from-to{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;text-align:center;font-size:13px}
+.from-to div{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px}
+.from-to .arrow{font-size:20px;color:var(--orange);font-weight:800}
+.hist{border-inline-start:3px solid var(--orange);padding-inline-start:10px;display:flex;flex-direction:column;gap:8px;font-size:14px}
+.search{border:1.5px solid var(--line);background:var(--bg);border-radius:12px;padding:9px 12px;width:100%}
+.msgs{display:flex;flex-direction:column;gap:8px;max-height:52vh;overflow-y:auto;padding:4px 2px}
+.bub{max-width:82%;padding:8px 12px;border-radius:16px;font-size:14px;line-height:1.5}
+.bub .label{display:block;font-size:11px;margin-top:2px}
+.bub.me{align-self:flex-start;background:var(--orange);color:#fff;border-bottom-right-radius:4px}
+.bub.me .label{color:rgba(255,255,255,.85)}
+.bub.them{align-self:flex-end;background:var(--soft);border:1px solid var(--line);border-bottom-left-radius:4px}
+.bub.sys{align-self:center;background:transparent;color:var(--muted);font-size:12px;text-align:center}
+.composer,form.composer{display:flex;flex-direction:row;gap:8px;margin-top:10px;align-items:center}
+.composer input{flex:1;min-width:0;border:1.5px solid var(--line);background:var(--bg);border-radius:99px;padding:9px 14px}
+textarea{font:inherit;color:inherit;border:1.5px solid var(--line);background:var(--bg);border-radius:12px;padding:10px 12px;width:100%;min-height:80px;resize:vertical}
+.badge{display:inline-grid;place-items:center;min-width:17px;height:17px;border-radius:99px;background:var(--red);color:#fff;font-size:10px;font-weight:800;padding:0 4px;margin-inline-start:3px}
+nav.tabs button{position:relative}
+nav.tabs .badge{position:absolute;top:2px;inset-inline-end:calc(50% - 22px)}
+.thread{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;text-align:right;background:none;border:none;border-top:1px solid var(--line);padding:11px 0;cursor:pointer}
+.thread:first-child{border-top:none}
+.thread > span:first-child{min-width:0}
+.ellip{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:230px}
+.ticket{border-top:1px solid var(--line);padding-block:12px;display:flex;flex-direction:column;gap:8px}
+.ticket:first-child{border-top:none}
+.methods{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.method{border:1.5px solid var(--line);background:var(--surface);border-radius:12px;padding:10px;cursor:pointer;text-align:right;display:flex;flex-direction:column;gap:2px}
+.method[aria-pressed="true"]{border-color:var(--orange);background:color-mix(in srgb,var(--orange) 10%,var(--surface))}
+.method strong{font-size:14px}
+.item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding-block:8px;border-top:1px solid var(--line);font-size:14px}
+.item:first-child{border-top:none}
+.item label{display:flex;gap:8px;align-items:center;cursor:pointer}
+.total{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:16px;padding-top:10px;border-top:2px solid var(--fg)}
+.iban{direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums;font-weight:800;letter-spacing:.5px;user-select:all}
+.code{font-size:34px;font-weight:800;letter-spacing:6px;color:var(--red);text-align:center;direction:ltr}
+.mtile{display:flex;flex-direction:column;gap:2px}
+.mtile b{font-size:20px;font-family:var(--display);font-weight:400;line-height:1.2}
+.medal{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;flex:none;font-size:20px;background:color-mix(in srgb,var(--orange) 18%,transparent)}
+.medal.gold{background:linear-gradient(145deg,#f3c44b,#d48d1c);box-shadow:0 0 0 3px color-mix(in srgb,#f3c44b 30%,transparent)}
+.honor{display:flex;gap:12px;align-items:center;padding-block:10px;border-top:1px solid var(--line)}
+.honor:first-child{border-top:none}
+.honor > div{min-width:0;flex:1}
+.potm{background:linear-gradient(160deg,var(--orange) 0%,var(--orange-deep) 100%);color:#fff;border:none}
+.potm .label{color:rgba(255,255,255,.88)}
+.lock{display:flex;gap:10px;align-items:flex-start;font-size:14px}
+.lock svg{width:22px;height:22px;flex:none;stroke:var(--orange);fill:none;stroke-width:2}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+</head>
+<body>
+
+
+<div class="banner"><div class="wrap">نسخة عرض سرية مقدمة لنادي رجال التعاون · صالحة حتى ١٩ ديسمبر ٢٠٢٦ · كل الأسماء والأرقام أمثلة</div></div>
+
+<header class="top">
+  <div class="wrap">
+    <img class="crest-img" src="data:image/png;base64,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" alt="شعار نادي رجال التعاون">
+    <div>
+      <h1>نادي رجال التعاون بجدة</h1>
+      <p>تعليم وتطوير مهارات كرة القدم · بيئة تربوية جاذبة تعليمية محفزة</p>
+    </div>
+  </div>
+</header>
+
+<div class="sessionbar"><div class="wrap"><span id="whoami"></span><span class="row" style="gap:14px;flex-wrap:nowrap"><button class="linkbtn" id="roleBtn" type="button" hidden></button><button class="linkbtn" id="switchBtn" type="button"></button></span></div></div>
+
+<main class="wrap" id="app"></main>
+
+<nav class="tabs" aria-label="التنقل"><div class="wrap" id="tabs"></div></nav>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+const ar = n => String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const toLatin = s => String(s ?? '').replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/\s|-/g,'');
+const BRANCHES = ['الوزيرية','السلامة','الفيصلية'];
+const CATS = ['تحت ٨','تحت ١٠','تحت ١٢','تحت ١٤','تحت ١٦'];
+const SKILLS = ['التمرير','المراوغة','التسديد','اللياقة','الانضباط'];
+
+// ================= Example data (all fictional) =================
+const DB = {
+  coaches: [
+    {id:'c1', n:'الكابتن سعيد', b:'الوزيرية', cats:'تحت ١٢', phone:'0500000101', inbox:[]},
+    {id:'c2', n:'الكابتن نايف', b:'الوزيرية', cats:'تحت ١٠ · تحت ١٢', phone:'0500000102', inbox:[]},
+    {id:'c3', n:'الكابتن حسام', b:'السلامة', cats:'تحت ١٢ · تحت ١٤', phone:'0500000103', inbox:[]},
+  ],
+  parents: {
+    '0500000001':{n:'أحمد محمد', consent:true, honor:true},
+    '0500000002':{n:'ماجد الحربي', consent:false, honor:false},
+    '0500000003':{n:'سعد العمري', consent:true, honor:true}, '0500000004':{n:'خالد الشهري', consent:true, honor:true},
+    '0500000005':{n:'علي القحطاني', consent:true, honor:true}, '0500000006':{n:'فهد الغامدي', consent:true, honor:true},
+    '0500000007':{n:'ناصر الدوسري', consent:true, honor:true}, '0500000008':{n:'حسن المالكي', consent:true, honor:true},
+    '0500000009':{n:'ماجد الزهراني', consent:true, honor:true},
+    '0500000102':{n:'نايف العنزي', consent:true, honor:true},
+  },
+  players: [],
+  events: [
+    {id:'e1', t:'ودية بين فرعي الوزيرية والسلامة', type:'مباراة', d:'الخميس', n:20, m:'نوفمبر', time:'٤:٣٠ م', b:'الكل', desc:'على ملعب فرع الوزيرية. الحضور قبل نص ساعة بالزي الرسمي.'},
+    {id:'m1', t:'مباراة ضد أكاديمية الصقور', type:'مباراة', d:'السبت', n:22, m:'نوفمبر', time:'٥:٠٠ م', b:'الوزيرية', desc:'ملعب فرع الوزيرية · الحضور ٤:٣٠ م بالزي الرسمي', team:'c1', cat:'تحت ١٢', squad:['p1','p2','p4','p6'], rsvp:{p1:'yes'}},
+    {id:'e2', t:'يوم العائلة الرياضي', type:'فعالية', d:'السبت', n:29, m:'نوفمبر', time:'٤:٠٠ م', b:'الكل', desc:'مسابقات للاعبين والأهالي وتوزيع شهادات التميز.'},
+  ],
+  threads: {
+    p1: {msgs:[
+      {from:'coach', t:'السلام عليكم أبو فيصل، فيصل مستواه ممتاز هالشهر. نبيه يركز على القدم اليسرى في البيت لو تقدرون.', w:'الأحد ٤:١٠ م'},
+      {from:'parent', t:'وعليكم السلام كابتن، الله يعطيك العافية. أبشر بنتابع معه.', w:'الأحد ٨:٣٠ م'},
+    ], unread:{parent:0, coach:0}},
+    p2: {msgs:[
+      {from:'parent', t:'كابتن، ريان عنده موعد مستشفى يوم الثلاثاء وبيغيب عن التمرين.', w:'اليوم ١١:٠٥ ص'},
+    ], unread:{parent:0, coach:1}},
+  },
+  support: {
+    active:null,
+    requests:[{id:1, reason:'مشكلة في رفع ملف Excel لفرع السلامة: الملف ينرفض. أحتاج أشوف سجل الأخطاء.', hours:2, w:'اليوم ١٢:٤٠ م', status:'بانتظار الموافقة'}],
+    log:[{t:'وصول دعم فني لمدة ساعة: إصلاح خطأ في إشعارات الغياب', who:'مقدّم الخدمة · بموافقة مدير النادي', w:'٢ نوفمبر · ٧:١٥ – ٧:৪০ م'.replace('৪০','٤٠')}],
+  },
+  week: 'الأسبوع الثالث · نوفمبر',
+  month: 'نوفمبر',
+  awards: [
+    {type:'week', pid:'p1', coach:'c1', label:'الأسبوع الأول · نوفمبر', reason:'أفضل تمريرات في التمرين، وروح قيادية', w:'٦ نوفمبر'},
+    {type:'week', pid:'p7', coach:'c2', label:'الأسبوع الأول · نوفمبر', reason:'سجّل هدفين في المباراة الودية', w:'٦ نوفمبر'},
+    {type:'week', pid:'p10', coach:'c3', label:'الأسبوع الأول · نوفمبر', reason:'التزام كامل بالحضور والتعليمات', w:'٦ نوفمبر'},
+    {type:'week', pid:'p4', coach:'c1', label:'الأسبوع الثاني · نوفمبر', reason:'تصديات حاسمة في تقسيمة التمرين', w:'١٣ نوفمبر'},
+    {type:'week', pid:'p7', coach:'c2', label:'الأسبوع الثاني · نوفمبر', reason:'تطور واضح في المراوغة', w:'١٣ نوفمبر'},
+    {type:'week', pid:'p9', coach:'c3', label:'الأسبوع الثاني · نوفمبر', reason:'رجع بقوة بعد الغياب وكان الأفضل', w:'١٣ نوفمبر'},
+    {type:'month', pid:'p6', coach:'c1', cat:'تحت ١٢', label:'أكتوبر', reason:'حضور كامل وأعلى تقييم في الفئة', w:'٣١ أكتوبر'},
+    {type:'month', pid:'p8', coach:'c2', cat:'تحت ١٠', label:'أكتوبر', reason:'أكثر لاعب تطور هالشهر', w:'٣١ أكتوبر'},
+    {type:'month', pid:'p10', coach:'c3', cat:'تحت ١٢', label:'أكتوبر', reason:'هداف الفئة للشهر', w:'٣١ أكتوبر'},
+  ],
+  prices: {renew:250, new:350, uniform:50, socks:10},
+  payments: [
+    {id:5001, pid:'p4', items:['تجديد شهري'], amount:250, method:'كاش', status:'مؤكد', by:'مشرف فرع الوزيرية', w:'اليوم ٥:١٠ م'},
+    {id:5002, pid:'p6', items:['تجديد شهري','بدلة'], amount:300, method:'Apple Pay', status:'مؤكد', by:'ولي الأمر', w:'اليوم ١٠:٢٢ ص'},
+    {id:5003, pid:'p10', items:['تجديد شهري'], amount:250, method:'تحويل بنكي', status:'بانتظار التأكيد', by:'ولي الأمر', w:'اليوم ٩:٠٥ ص', receipt:'إيصال-تحويل.jpg'},
+    {id:5004, pid:'p7', items:['تجديد شهري'], amount:250, method:'شبكة (مدى)', status:'مؤكد', by:'مشرف فرع الوزيرية', w:'أمس'},
+    {id:5005, pid:'p8', items:['اشتراك جديد','بدلة','شراريب'], amount:410, method:'كاش', status:'مؤكد', by:'مشرف فرع الوزيرية', w:'أمس'},
+    {id:5006, pid:'p3', items:['تجديد شهري'], amount:250, method:'كاش', status:'بانتظار الدفع', by:'ولي الأمر', w:'أمس', code:'4821'},
+  ],
+  tickets: [
+    {id:101, from:'coach', name:'الكابتن حسام', about:'عمر حسن المالكي', type:'غياب متكرر', text:'غاب ٣ تمارين متتالية بدون عذر، وما يرد على الرسائل. أحتاج تواصل من الإدارة مع ولي الأمر.', status:'جديدة', w:'أمس', replies:[]},
+  ],
+  pending: [
+    {n:'زياد عبدالرحمن', a:9, b:'السلامة', parent:'عبدالرحمن علي', phone:'0500000020', w:'اليوم'},
+    {n:'مشاري سامي', a:11, b:'الوزيرية', parent:'سامي فهد', phone:'0500000021', w:'أمس'},
+  ],
+};
+let seed = 7; const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+function mk(id, n, age, b, cat, pos, coach, parent, sub){
+  const att = Array.from({length:10}, () => { const r = rnd(); return r < .1 ? 'a' : r < .2 ? 'l' : 'p'; }).join('');
+  const skills = {}; SKILLS.forEach(s => skills[s] = 50 + Math.round(rnd()*45));
+  return {id, n, age, b, cat, pos, coach, parent, att, skills, note:'', sub: sub || {until:'٣٠ نوفمبر', st:'ok', label:'مدفوع'},
+    notifs: [{c:'var(--red)', i:'⚽', t:'مباراة ودية الخميس ٢٠ نوفمبر الساعة ٤:٣٠ م.', w:'أمس'}],
+    history: [{t:`انضم لفريق ${coachName(coach)}`, w:'سبتمبر ٢٠٢٦'}]};
+}
+function coachName(id){ const c = DB.coaches.find(c => c.id === id); return c ? c.n : 'بدون مدرب'; }
+DB.players = [
+  mk('p1','فيصل أحمد محمد',11,'الوزيرية','تحت ١٢','وسط','c1','0500000001',{until:'١٨ نوفمبر', st:'warn', label:'يتجدد خلال ٥ أيام'}),
+  mk('p2','ريان ماجد الحربي',11,'الوزيرية','تحت ١٢','هجوم','c1','0500000002'),
+  mk('p3','إياد ماجد الحربي',9,'الوزيرية','تحت ١٠','دفاع','c2','0500000002'),
+  mk('p4','عبدالله سعد العمري',12,'الوزيرية','تحت ١٢','حارس','c1','0500000003'),
+  mk('p5','محمد خالد الشهري',11,'الوزيرية','تحت ١٢','دفاع','c1','0500000004',{until:'١ نوفمبر', st:'bad', label:'متأخر ١٢ يوم'}),
+  mk('p6','يوسف علي القحطاني',12,'الوزيرية','تحت ١٢','وسط','c1','0500000005'),
+  mk('p7','سلمان فهد الغامدي',9,'الوزيرية','تحت ١٠','هجوم','c2','0500000006'),
+  mk('p8','تركي ناصر الدوسري',10,'الوزيرية','تحت ١٠','وسط','c2','0500000007'),
+  mk('p9','عمر حسن المالكي',13,'السلامة','تحت ١٤','دفاع','c3','0500000008',{until:'٥ نوفمبر', st:'bad', label:'متأخر ٨ أيام'}),
+  mk('p10','راكان ماجد الزهراني',11,'السلامة','تحت ١٢','هجوم','c3','0500000009'),
+  mk('p11','خالد نايف العنزي',11,'السلامة','تحت ١٢','وسط','c3','0500000102'),
+];
+DB.players[0].note = 'تحسّن واضح في التمرير. نركز الشهر الجاي على استخدام القدم اليسرى.';
+DB.players[0].att = 'pppplpppap';
+
+// ================= Session & navigation =================
+let me = {type:'guest'};
+let tab = 'home';
+const ICONS = {
+  home:'<path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
+  branches:'<path d="M12 21s-7-6-7-11a7 7 0 0 1 14 0c0 5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>',
+  register:'<path d="M12 5v14M5 12h14"/>',
+  login:'<path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/>',
+  kids:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',
+  account:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="10" r="3"/><path d="M6.5 18.5c1.5-2 3.4-3 5.5-3s4 1 5.5 3"/>',
+  team:'<path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/>',
+  rate:'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',
+  dash:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+  players:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.3 3-5.5 6.5-5.5s6.5 2.2 6.5 5.5"/><circle cx="17" cy="9" r="2.5"/><path d="M17 14c2.5 0 4.5 1.6 4.5 4"/>',
+  coaches:'<path d="M12 2l3 6 6 .9-4.5 4.3 1 6.3L12 16.5 6.5 19.5l1-6.3L3 8.9 9 8z"/>',
+  data:'<path d="M4 4h16v16H4z"/><path d="M4 10h16M10 4v16"/>',
+  payments:'<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h4"/>',
+  messages:'<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>',
+  events:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+};
+const TABS = {
+  guest:  [['home','الرئيسية'],['branches','الفروع'],['register','تسجيل'],['login','دخول']],
+  parent: [['kids','أبنائي'],['messages','الرسائل'],['home','الجدول'],['branches','الفروع'],['account','حسابي']],
+  coach:  [['team','فريقي'],['messages','الرسائل'],['rate','التقييم'],['home','المباريات'],['account','حسابي']],
+  admin:  [['dash','اللوحة'],['players','اللاعبين'],['payments','المدفوعات'],['coaches','المدربين'],['events','الفعاليات'],['account','حسابي']],
+};
+function rolesFor(ph){
+  const r = [], c = DB.coaches.find(c => c.phone === ph);
+  if (c) r.push({type:'coach', id:c.id, phone:ph});
+  if (DB.parents[ph]) r.push({type:'parent', phone:ph});
+  if (ph === '0500000999') r.push({type:'admin', phone:ph});
+  return r;
+}
+function renderChrome(){
+  const t = TABS[me.type];
+  $('tabs').style.setProperty('--tabs', t.length);
+  const badge = k => { const n = k==='messages' ? unreadCount() : (k==='dash' && me.type==='admin') ? DB.tickets.filter(x=>x.status==='جديدة').length : (k==='payments') ? DB.payments.filter(x=>x.status!=='مؤكد').length : 0; return n ? `<span class="badge num">${ar(n)}</span>` : ''; };
+  $('tabs').innerHTML = t.map(([k,l]) => `<button type="button" data-tab="${k}" ${k===tab?'aria-current="page"':''}><svg viewBox="0 0 24 24">${ICONS[k]}</svg>${l}${badge(k)}</button>`).join('');
+  const label = {guest:['زائر','guest'], parent:['ولي أمر','parent'], coach:['مدرب','coach'], admin:['الإدارة','admin']}[me.type];
+  const name = me.type==='parent' ? DB.parents[me.phone].n : me.type==='coach' ? coachName(me.id) : me.type==='admin' ? 'مدير النادي' : 'غير مسجل دخول';
+  $('whoami').innerHTML = `<b>${esc(name)}</b><span class="role-pill ${label[1]}">${label[0]}</span>`;
+  $('switchBtn').textContent = me.type==='guest' ? 'تسجيل الدخول' : 'خروج';
+  const dual = me.phone && rolesFor(me.phone).length > 1;
+  $('roleBtn').hidden = !dual;
+  if (dual) $('roleBtn').textContent = me.type==='coach' ? 'واجهة ولي الأمر ⇄' : 'واجهة المدرب ⇄';
+}
+$('roleBtn').onclick = () => { const other = rolesFor(me.phone).find(r => r.type !== me.type); if (other) { kidSel = null; login(other); } };
+function go(t){ if (t !== tab) { matchMsg = ''; monthMsg = ''; msgToast = ''; msgView = null; payDone = ''; paySheet = false; payMsgAdmin = ''; } tab = t; renderChrome(); render(); window.scrollTo(0,0); }
+$('tabs').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (b) go(b.dataset.tab); });
+$('switchBtn').onclick = () => { me = {type:'guest'}; go('login'); };
+function login(who){ if (!who.phone && who.type !== 'guest') who.phone = phoneOf(who); me = who; go(TABS[me.type][0][0]); }
+
+// ================= Screens =================
+const pitchSvg = `<svg class="pitch" viewBox="0 0 300 160" preserveAspectRatio="none" aria-hidden="true"><rect x="6" y="6" width="288" height="148" fill="none" stroke="#fff" stroke-width="3"/><line x1="150" y1="6" x2="150" y2="154" stroke="#fff" stroke-width="3"/><circle cx="150" cy="80" r="28" fill="none" stroke="#fff" stroke-width="3"/><rect x="6" y="45" width="40" height="70" fill="none" stroke="#fff" stroke-width="3"/><rect x="254" y="45" width="40" height="70" fill="none" stroke="#fff" stroke-width="3"/></svg>`;
+const lockIc = '<svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>';
+const sessions = [
+  {d:'الأحد',n:16,t:'تمرين مهارات',time:'٥:٠٠ – ٦:٣٠ م',k:'ok',c:'تمرين'},
+  {d:'الثلاثاء',n:18,t:'تمرين لياقة وتكتيك',time:'٥:٠٠ – ٦:٣٠ م',k:'ok',c:'تمرين'},
+];
+const TYPE_CHIP = {'مباراة':'match','بطولة':'match','فعالية':'warn','رحلة':'warn','اجتماع أولياء أمور':'ok'};
+const visibleEvents = () => DB.events.filter(e => !e.team || me.type==='admin' || (me.type==='coach' && e.team===me.id) || (me.type==='parent' && DB.players.some(p => p.parent===me.phone && p.coach===e.team)));
+function matchExtra(e){
+  if (!e.team) return '';
+  const rs = e.rsvp || {}, yes = e.squad.filter(id => rs[id]==='yes').length, no = e.squad.filter(id => rs[id]==='no').length;
+  if (me.type==='coach' && e.team===me.id) return `<div class="row" style="gap:6px;margin-top:6px"><span class="chip ok num">القائمة ${ar(e.squad.length)}</span><span class="chip ok num">أكد ${ar(yes)}</span>${no?`<span class="chip bad num">اعتذر ${ar(no)}</span>`:''}<span class="chip warn num">بانتظار ${ar(e.squad.length-yes-no)}</span><button class="linkbtn" type="button" data-del-match="${e.id}" style="font-size:12px">إلغاء المباراة</button></div>`;
+  if (me.type==='parent') return DB.players.filter(p => p.parent===me.phone && p.coach===e.team).map(k => {
+    const fn = esc(firstName(k.n));
+    if (!e.squad.includes(k.id)) return `<div class="label" style="margin-top:6px">${fn} مو ضمن قائمة هالمباراة.</div>`;
+    const v = rs[k.id];
+    return `<div class="row" style="gap:6px;margin-top:6px"><span class="chip ok">${fn} ضمن القائمة</span>${v ? `<span class="chip ${v==='yes'?'ok':'bad'}">${v==='yes'?'أكدت الحضور':'اعتذرت'}</span><button class="linkbtn" type="button" data-rsvp="${e.id}|${k.id}|" style="font-size:12px">تغيير</button>` : `<button class="btn btn-orange btn-sm" type="button" data-rsvp="${e.id}|${k.id}|yes">يحضر</button><button class="btn btn-ghost btn-sm" type="button" data-rsvp="${e.id}|${k.id}|no">ما يقدر</button>`}</div>`;
+  }).join('');
+  if (me.type==='admin') return `<div class="label" style="margin-top:4px">القائمة ${ar(e.squad.length)} لاعب · أكد ${ar(yes)}</div>`;
+  return '';
+}
+const eventsHtml = list => list.map(e => `<div class="session"><div class="day"><b class="num">${ar(e.n)}</b><span>${e.d}</span></div><div style="min-width:0"><strong>${esc(e.t)}</strong><div class="label">${e.time} · ${e.team ? 'فريق ' + esc(coachName(e.team)) + ' · ' + esc(e.cat) : (e.b==='الكل'?'كل الفروع':'فرع '+esc(e.b))}</div>${e.desc?`<div class="label">${esc(e.desc)}</div>`:''}${matchExtra(e)}</div><span class="chip ${TYPE_CHIP[e.type]||'warn'}">${esc(e.type)}</span></div>`).join('');
+let matchMsg = '';
+function coachMatchCard(){
+  const ps = myPlayers(), c = DB.coaches.find(c => c.id === me.id), cats = [...new Set(ps.map(p => p.cat))];
+  return `<div class="card"><h3 style="margin-bottom:4px">مباراة جديدة لفريقك</h3>
+    <p class="label" style="margin:0 0 10px">أنت تحدد الموعد والخصم واللاعبين المستدعين. يوصل إشعار لأهاليهم، ويأكدون الحضور من التطبيق.</p>
+    ${matchMsg ? `<div class="toast" style="margin-bottom:10px">${matchMsg}</div>` : ''}
+    <form id="matchForm" novalidate style="gap:10px">
+      <div class="field"><label for="mt-opp">الخصم</label><input id="mt-opp" placeholder="مثلاً: أكاديمية النجوم"></div>
+      <div class="grid2">
+        <div class="field"><label for="mt-date">التاريخ</label><input id="mt-date" type="date" value="2026-11-29"></div>
+        <div class="field"><label for="mt-time">وقت المباراة</label><input id="mt-time" type="time" value="17:00"></div>
+        <div class="field"><label for="mt-meet">الحضور قبل</label><select id="mt-meet"><option>نص ساعة</option><option>ساعة</option><option>ساعة ونص</option></select></div>
+        <div class="field"><label for="mt-cat">الفئة</label><select id="mt-cat">${cats.map(x => `<option>${x}</option>`).join('')}</select></div>
+      </div>
+      <div class="field"><label for="mt-place">المكان</label><input id="mt-place" value="ملعب فرع ${esc(c.b)}"></div>
+      <div><strong style="font-size:14px">اللاعبين المستدعين</strong>${ps.map(p => `<div class="item"><label><input type="checkbox" class="sq" value="${p.id}" checked>${esc(p.n)}</label><span class="label">${p.cat}</span></div>`).join('')}</div>
+      <div id="mtErr" class="err" hidden></div>
+      <button class="btn btn-orange" type="submit">نشر المباراة وإشعار الأهالي</button>
+    </form></div>`;
+}
+const sessionsHtml = () => sessions.map(s => `<div class="session"><div class="day"><b class="num">${ar(s.n)}</b><span>${s.d}</span></div><div><strong>${s.t}</strong><div class="label">${s.time}</div></div><span class="chip ${s.k}">${s.c}</span></div>`).join('');
+const skillsHtml = sk => Object.entries(sk).map(([n,v]) => `<div class="skill"><span>${n}</span><div class="bar"><i style="width:${v}%"></i></div><span class="num label">${ar(v)}</span></div>`).join('');
+const dotsHtml = att => att.split('').map((x,i) => `<span class="dot ${x}">${ar(i+1)}</span>`).join('');
+const attRate = att => Math.round(att.split('').filter(x => x !== 'a').length / att.length * 100);
+const notifHtml = list => list.length ? list.map(n => `<div class="notif"><span class="ic" style="background:color-mix(in srgb, ${n.c} 16%, transparent);color:${n.c}">${n.i}</span><div style="flex:1;min-width:0">${esc(n.t)}<div class="label">${n.w}</div></div></div>`).join('') : '<p class="label" style="margin:0">ما فيه إشعارات جديدة.</p>';
+
+const S = {};
+const thread = pid => DB.threads[pid] || (DB.threads[pid] = {msgs:[], unread:{parent:0, coach:0}});
+function unreadCount(){
+  if (me.type==='parent') return DB.players.filter(p=>p.parent===me.phone).reduce((a,p)=>a+(DB.threads[p.id]?.unread.parent||0),0);
+  if (me.type==='coach') return DB.players.filter(p=>p.coach===me.id).reduce((a,p)=>a+(DB.threads[p.id]?.unread.coach||0),0);
+  return 0;
+}
+const nowLabel = () => 'الآن';
+function bubbles(pid, myRole){
+  const th = thread(pid);
+  if (!th.msgs.length) return '<div class="bub sys">ما فيه رسائل للحين. ابدأ المحادثة.</div>';
+  return th.msgs.map(m => m.from==='sys' ? `<div class="bub sys">${esc(m.t)}</div>` :
+    `<div class="bub ${m.from===myRole?'me':'them'}">${esc(m.t)}<span class="label">${m.from===myRole?'أنت':(m.from==='coach'?'المدرب':m.from==='admin'?'الإدارة':'ولي الأمر')} · ${m.w}</span></div>`).join('');
+}
+function newTicket(t){ t.id = Math.max(100, ...DB.tickets.map(x=>x.id)) + 1; t.status='جديدة'; t.w='الآن'; t.replies=[]; DB.tickets.unshift(t); return t.id; }
+let msgView = null, msgToast = '';
+
+S.home = () => `
+  <section class="screen">
+    ${me.type==='guest' ? `<div class="card hero">${pitchSvg}<h2>طريقك للاحتراف يبدأ هنا</h2><p>سجّل ابنك في أقرب فرع، وتابع حضوره وتقييمه واشتراكه من جوالك.</p><button class="btn btn-white" data-tab="register">التسجيل الإلكتروني</button></div>
+      <div class="card lock">${lockIc}<div><strong>بيانات اللاعبين محمية</strong><div class="label">الحضور والتقييمات والاشتراكات ما تظهر لأي أحد يفتح التطبيق. كل شخص يدخل برقم جواله، ويشوف اللي يخصه بس.</div></div></div>` : ''}
+    ${me.type==='coach' ? coachMatchCard() : honorBoard()}
+    <div class="card"><div class="row between"><h3>الفعاليات والمباريات</h3><span class="label">${me.type==='coach' ? 'مبارياتك وفعاليات النادي' : 'من الإدارة والمدربين'}</span></div><div style="margin-top:8px">${visibleEvents().length ? eventsHtml(visibleEvents()) : '<p class="label" style="margin:0">ما فيه فعاليات قريبة.</p>'}</div></div>
+    ${me.type==='coach' ? honorBoard() : ''}
+    <div class="card"><div class="row between"><h3>التمارين الأسبوعية</h3><span class="label">الوزيرية</span></div><div style="margin-top:8px">${sessionsHtml()}</div></div>
+    ${me.type==='guest' ? `<div class="card"><h3 style="margin-bottom:10px">تابعنا</h3><div class="socials">
+      <a href="https://instagram.com/altaawoun11" target="_blank" rel="noopener">انستقرام</a><a href="https://www.snapchat.com/add/altaawoun11" target="_blank" rel="noopener">سناب شات</a><a href="https://www.tiktok.com/@altaawoun11" target="_blank" rel="noopener">تيك توك</a><a href="https://youtube.com/channel/UCeK0B84rLwwpTqDbexQW8Xg" target="_blank" rel="noopener">يوتيوب</a><a href="https://t.me/Altaawoun11" target="_blank" rel="noopener">تليجرام</a></div></div>` : ''}
+  </section>`;
+
+const BR = [
+  {n:'فرع الوزيرية', map:'https://goo.gl/maps/8fa9DdeXrmKG9afW9', wa:'https://api.whatsapp.com/send?phone=966551530051', ph:'+966 55 153 0051'},
+  {n:'فرع السلامة', map:'https://goo.gl/maps/iVZ468nvtmJTu1PA8', wa:'https://wa.me/message/SGK4THPA4W7FH1', ph:null},
+  {n:'فرع الفيصلية', map:'https://maps.app.goo.gl/Qc7aQfAqGjYCJMgc9', wa:'https://api.whatsapp.com/send?phone=966564885113', ph:'+966 56 488 5113'},
+];
+S.branches = () => `<section class="screen">${BR.map(b => `
+  <div class="card branch"><div class="row between"><h3>${b.n}</h3><span class="label">جدة</span></div>
+  ${b.ph ? `<div class="label">واتساب: <span class="phone">${b.ph}</span></div>` : `<div class="label">التواصل عبر رابط واتساب</div>`}
+  <div class="row"><a class="btn btn-ghost" href="${b.map}" target="_blank" rel="noopener">الموقع على الخريطة</a><a class="btn btn-orange" href="${b.wa}" target="_blank" rel="noopener">تواصل واتساب</a></div></div>`).join('')}</section>`;
+
+S.register = () => `
+  <section class="screen"><div class="card">
+    <h2 style="font-size:20px;margin-bottom:4px">التسجيل المبدئي</h2>
+    <p class="label" style="margin:0 0 12px">الطلب يوصل لإدارة الفرع، ويتواصلون معك خلال يوم عمل.</p>
+    <form id="regForm" novalidate>
+      <div class="field"><label for="f-name">اسم اللاعب</label><input id="f-name" placeholder="الاسم الثلاثي"></div>
+      <div class="grid2"><div class="field"><label for="f-age">العمر</label><input id="f-age" type="number" min="4" max="18" placeholder="مثلاً ١٠"></div>
+      <div class="field"><label for="f-branch">الفرع</label><select id="f-branch"><option value="">اختر</option>${BRANCHES.map(b=>`<option>${b}</option>`).join('')}</select></div></div>
+      <div class="field"><label for="f-parent">اسم ولي الأمر</label><input id="f-parent"></div>
+      <div class="field"><label for="f-phone">جوال ولي الأمر</label><input id="f-phone" type="tel" inputmode="tel" dir="ltr" placeholder="05xxxxxxxx"></div>
+      <label class="row" style="gap:8px;font-size:14px;align-items:flex-start;flex-wrap:nowrap"><input type="checkbox" id="f-consent" style="margin-top:5px;flex:none"><span>أوافق بصفتي ولي الأمر على تسجيل ابني وعلى استخدام بياناته لأغراض الأكاديمية فقط، وفق سياسة الخصوصية.</span></label>
+      <div id="formErr" class="err" hidden></div>
+      <button class="btn btn-orange" type="submit">إرسال طلب التسجيل</button>
+    </form>
+    <div id="regDone" class="toast" hidden></div>
+  </div></section>`;
+
+// ---- Login
+let pendingLogin = null;
+const ACCOUNTS = [
+  {who:{type:'parent', phone:'0500000001'}, t:'أحمد محمد', s:'ولي أمر · ابن واحد (فيصل)'},
+  {who:{type:'parent', phone:'0500000002'}, t:'ماجد الحربي', s:'ولي أمر · ولدين عند مدربين مختلفين · أول دخول'},
+  {who:{type:'coach', id:'c1'}, t:'الكابتن سعيد', s:'مدرب · الوزيرية · تحت ١٢'},
+  {who:{type:'coach', id:'c2'}, t:'الكابتن نايف', s:'مدرب في الوزيرية، وولي أمر لاعب في السلامة'},
+  {who:{type:'admin'}, t:'مدير النادي', s:'الإدارة · كل الفروع'},
+];
+const phoneOf = w => w.type==='parent' ? w.phone : w.type==='coach' ? DB.coaches.find(c=>c.id===w.id).phone : '0500000999';
+S.login = () => (pendingLogin && pendingLogin.choose) ? `
+  <section class="screen"><div class="card" style="display:flex;flex-direction:column;gap:12px">
+    <h2 style="font-size:20px">عندك حسابين بنفس الرقم</h2>
+    <p class="label" style="margin:0">رقمك مسجل كمدرب وكولي أمر. اختر الواجهة، وتقدر تبدّل بينهم في أي وقت من الشريط اللي فوق.</p>
+    ${rolesFor(pendingLogin.phone).map(r => `<button type="button" class="acct" data-role-pick="${r.type}"><span><strong>${r.type==='coach' ? 'واجهة المدرب' : 'واجهة ولي الأمر'}</strong><span class="label">${r.type==='coach' ? 'فريقك والتحضير والتقييم والمباريات' : 'أبناؤك وحضورهم واشتراكاتهم'}</span></span><span class="role-pill ${r.type}">${r.type==='coach'?'مدرب':'ولي أمر'}</span></button>`).join('')}
+  </div></section>` : pendingLogin ? `
+  <section class="screen"><div class="card" style="display:flex;flex-direction:column;gap:14px;text-align:center">
+    <h2 style="font-size:20px">رمز التحقق</h2>
+    <p class="label" style="margin:0">أرسلنا رمز من ٤ أرقام برسالة SMS إلى <span class="phone">${pendingLogin.phone}</span></p>
+    <div class="otp" aria-label="الرمز ١٢٣٤"><span>1</span><span>2</span><span>3</span><span>4</span></div>
+    <p class="label" style="margin:0">في النموذج الرمز معبّى تلقائياً.</p>
+    <button class="btn btn-orange" id="otpGo" type="button">دخول</button>
+    <button class="linkbtn" id="otpBack" type="button">رجوع</button>
+  </div></section>` : `
+  <section class="screen">
+    <div class="card">
+      <h2 style="font-size:20px;margin-bottom:4px">تسجيل الدخول</h2>
+      <p class="label" style="margin:0 0 12px">ولي الأمر والمدرب والإدارة يدخلون برقم الجوال المسجل عند النادي، بدون كلمة مرور.</p>
+      <div class="field"><label for="loginPhone">رقم الجوال</label><input id="loginPhone" type="tel" dir="ltr" inputmode="tel" placeholder="05xxxxxxxx"></div>
+      <div id="loginErr" class="err" style="margin-top:10px" hidden></div>
+      <button class="btn btn-orange" id="loginGo" type="button" style="margin-top:12px;width:100%">إرسال رمز التحقق</button>
+    </div>
+    <div class="card">
+      <h3 style="margin-bottom:4px">حسابات تجريبية</h3>
+      <p class="label" style="margin:0 0 10px">اختر حساباً وشوف كيف يختلف التطبيق حسب صاحب الحساب:</p>
+      <div style="display:flex;flex-direction:column;gap:8px">${ACCOUNTS.map((a,i) => `<button type="button" class="acct" data-acct="${i}"><span><strong>${a.t}</strong><span class="label">${a.s}</span></span><span class="label phone">${phoneOf(a.who)}</span></button>`).join('')}</div>
+    </div>
+  </section>`;
+
+// ---- Account / permissions
+const PERMS = {
+  parent: {y:['بيانات أبنائك فقط: الحضور والتقييم والاشتراك','إشعارات الغياب والتقييم والنقل','تأكيد حضور ابنك للمباريات','مراسلة مدرب ابنك داخل التطبيق، وإرسال شكوى أو اقتراح للإدارة','جدول التمارين وبيانات الفروع'], n:['بيانات أي لاعب ثاني','تقييمات وحضور زملاء ابنك','أرقام جوالات الأهالي الثانيين']},
+  coach:  {y:['لاعبي فريقك فقط','تحضير فريقك وتقييمه، واختيار لاعب الأسبوع ولاعب الشهر لكل فئة تدربها','تحديد مباريات فريقك واختيار اللاعبين المستدعين','مراسلة أهالي فريقك، ورفع بلاغ للإدارة','التواصل مع أهالي فريقك من التطبيق بدون ما يظهر رقمك الشخصي'], n:['لاعبي المدربين الثانيين','الاشتراكات والمدفوعات','نقل اللاعبين أو قبول التسجيل (من صلاحيات الإدارة)']},
+  admin:  {y:['كل اللاعبين والمدربين في الفروع الثلاثة','قبول التسجيل ونقل اللاعبين بين المدربين','إضافة الفعاليات والمباريات وإشعار الأهالي','متابعة جوائز الأسبوع والشهر لكل فئة وتذكير المدربين','استقبال البلاغات والشكاوى والرد عليها، والاطلاع على المحادثات المرفوعة','المدفوعات بكل طرقها: كاش وشبكة وApple Pay وتحويل، وتأكيد التحويلات','الاشتراكات والتقارير ورفع ملفات Excel'], n:['كل عملية نقل أو تعديل أو دفعة تنحفظ في سجل باسم الموظف اللي سواها','مقدّم الخدمة التقنية ما يشوف بيانات اللاعبين إلا بموافقتكم ولمدة محددة']},
+};
+S.account = () => { const p = PERMS[me.type]; return `
+  <section class="screen">
+    <div class="card"><h3 style="margin-bottom:10px">وش تشوف بهذا الحساب</h3>
+      <ul class="perm">${p.y.map(x=>`<li><span class="y">✓</span><span>${x}</span></li>`).join('')}</ul></div>
+    <div class="card"><h3 style="margin-bottom:10px">${me.type==='admin' ? 'للمراجعة والمساءلة' : 'وش ما تقدر تشوف'}</h3>
+      <ul class="perm">${p.n.map(x=>`<li><span class="${me.type==='admin'?'y':'n'}">${me.type==='admin'?'•':'✕'}</span><span>${x}</span></li>`).join('')}</ul></div>
+    ${me.type==='admin' ? billingCard() + supportCard(true) : ''}
+    <button class="btn btn-ghost" type="button" id="logout">تسجيل الخروج</button>
+  </section>`; };
+
+// ---- Parent
+let kidSel = null;
+S.kids = () => {
+  const par = DB.parents[me.phone];
+  if (!par.consent) return `
+    <section class="screen"><div class="card" style="display:flex;flex-direction:column;gap:12px">
+      <h2 style="font-size:20px">أهلاً ${esc(par.n)}</h2>
+      <p style="margin:0">النادي أضاف بيانات أبنائك للتطبيق. قبل ما تشوفها، نحتاج موافقتك على طريقة استخدامها:</p>
+      <ul class="perm"><li><span class="y">•</span><span>نستخدم البيانات لإدارة التمارين والحضور والتقييم والاشتراك فقط.</span></li>
+      <li><span class="y">•</span><span>ما يشوف بيانات ابنك غيرك ومدربه وإدارة النادي. وإذا فاز بميدالية، اسمه يطلع في لوحة الشرف بس إذا وافقت.</span></li>
+      <li><span class="y">•</span><span>تقدر تطلب نسخة من البيانات أو تصحيحها أو حذفها في أي وقت.</span></li></ul>
+      <label class="row" style="gap:8px;font-size:14px;align-items:flex-start;flex-wrap:nowrap"><input type="checkbox" id="consentChk" style="margin-top:5px;flex:none"><span>قرأت سياسة الخصوصية وأوافق عليها بصفتي ولي الأمر.</span></label>
+      <label class="row" style="gap:8px;font-size:14px;align-items:flex-start;flex-wrap:nowrap"><input type="checkbox" id="honorChk" style="margin-top:5px;flex:none"><span>(اختياري) أوافق على ظهور اسم ابني في لوحة الشرف لأهالي النادي إذا فاز بميدالية.</span></label>
+      <div id="consentErr" class="err" hidden>لازم توافق على سياسة الخصوصية عشان تكمل.</div>
+      <button class="btn btn-orange" id="consentGo" type="button">موافق، كمّل</button>
+    </div></section>`;
+  const kids = DB.players.filter(p => p.parent === me.phone);
+  if (!kids.find(k => k.id === kidSel)) kidSel = kids[0]?.id;
+  const k = kids.find(k => k.id === kidSel);
+  if (!k) return `<section class="screen"><div class="card">ما فيه لاعبين مرتبطين برقمك.</div></section>`;
+  return `
+  <section class="screen">
+    ${kids.length > 1 ? `<div class="kids" role="group" aria-label="اختر الابن">${kids.map(x => `<button type="button" data-kid="${x.id}" aria-pressed="${x.id===k.id}">${esc(x.n.split(' ')[0])}</button>`).join('')}</div>` : ''}
+    <div class="card player-head"><div class="avatar">${esc(k.n[0])}</div>
+      <div style="flex:1;min-width:0"><h2 style="font-size:20px">${esc(k.n)}</h2><div class="label">${k.cat} · فرع ${k.b} · ${k.pos}</div><div class="label">المدرب: <strong>${esc(coachName(k.coach))}</strong></div></div>${k.coach ? '<button class="btn btn-ghost btn-sm" type="button" data-tab="messages">راسل المدرب</button>' : ''}</div>
+    <div class="card"><h3 style="margin-bottom:6px">الإشعارات</h3>${notifHtml(k.notifs)}</div>
+    <div class="card"><div class="row between"><h3>الاشتراك</h3><span class="chip ${k.sub.st}">${k.sub.label}</span></div>
+      <div class="label" style="margin-top:6px">شهري · ينتهي ${k.sub.until}</div>
+      ${parentPayBlock(k)}</div>
+    <div class="card"><div class="row between"><h3>الحضور</h3><span class="label num">${ar(attRate(k.att))}٪</span></div>
+      <div class="dots" style="margin-top:10px">${dotsHtml(k.att)}</div>
+      <div class="legend" style="margin-top:8px"><span><i style="background:var(--ok)"></i>حاضر</span><span><i style="background:var(--warn)"></i>متأخر</span><span><i style="background:var(--bad)"></i>غائب</span></div></div>
+    <div class="card"><h3 style="margin-bottom:10px">تقييم المدرب</h3><div style="display:flex;flex-direction:column;gap:10px">${skillsHtml(k.skills)}</div>
+      ${k.note ? `<p style="margin:12px 0 0;padding:10px;border-radius:12px;background:var(--soft);font-size:14px"><strong>ملاحظة المدرب:</strong> ${esc(k.note)}</p>` : ''}</div>
+    ${playerAwardsCard(k)}
+    <div class="card"><h3 style="margin-bottom:10px">سجل اللاعب</h3><div class="hist">${k.history.slice().reverse().map(h => `<div>${esc(h.t)}<div class="label">${h.w}</div></div>`).join('')}</div></div>
+  </section>`;
+};
+
+// ---- Payments
+const METHODS = [
+  {k:'Apple Pay', s:'دفع فوري من الجوال'},
+  {k:'مدى / بطاقة', s:'دفع فوري بالبطاقة'},
+  {k:'تحويل بنكي', s:'حوّل وارفع صورة الإيصال'},
+  {k:'كاش في الفرع', s:'ادفع للمشرف واستلم إيصال'},
+];
+const ITEMS = [['renew','تجديد شهري'],['uniform','بدلة'],['socks','شراريب']];
+let paySheet = false, payItems = {renew:true, uniform:false, socks:false}, payMethod = 'Apple Pay', payDone = '';
+const sar = n => `${ar(n)} ريال`;
+const payTotal = () => ITEMS.reduce((a,[k]) => a + (payItems[k] ? DB.prices[k] : 0), 0);
+const methodChip = m => ({'كاش':'warn','شبكة (مدى)':'ok','Apple Pay':'ok','مدى / بطاقة':'ok','تحويل بنكي':'match'}[m] || 'ok');
+const statusChip = st => st==='مؤكد' ? 'ok' : st==='بانتظار التأكيد' ? 'warn' : st==='مرفوض' ? 'bad' : 'warn';
+function markPaid(p, items){
+  if (items.includes('تجديد شهري') || items.includes('اشتراك جديد')) p.sub = {until:'٣١ ديسمبر', st:'ok', label:'مدفوع'};
+}
+function receiptNotif(pay){
+  const p = DB.players.find(x => x.id === pay.pid);
+  p?.notifs.unshift({c:'var(--ok)', i:'🧾', t:`إيصال #${ar(pay.id)}: استلمنا ${sar(pay.amount)} (${pay.items.join('، ')}) · ${pay.method}.`, w:'الآن'});
+}
+function parentPayBlock(k){
+  const mine = DB.payments.filter(x => x.pid === k.id);
+  const open = mine.find(x => x.status !== 'مؤكد' && x.status !== 'مرفوض');
+  const hist = mine.length ? `<div style="margin-top:12px"><strong style="font-size:14px">سجل المدفوعات</strong>${mine.slice(0,4).map(x => `<div class="list-row"><div><span>${sar(x.amount)} · ${x.items.join('، ')}</span><div class="label">${x.method} · ${x.w}</div></div><span class="chip ${statusChip(x.status)}">${x.status}</span></div>`).join('')}</div>` : '';
+  if (payDone) return `<div class="toast" style="margin-top:10px">${payDone}</div>${hist}`;
+  if (open && !paySheet) return `<div class="toast" style="margin-top:10px;${open.status==='بانتظار الدفع'?'':''}">
+      ${open.status==='بانتظار الدفع' ? `<strong>بانتظار الدفع كاش في الفرع</strong><br>اعرض هذا الرقم للمشرف وادفع ${sar(open.amount)}:<div class="code">${open.code}</div><span class="label">بعد ما يستلم المشرف المبلغ، يوصلك إيصال إلكتروني هنا.</span>`
+      : `<strong>استلمنا إيصال التحويل</strong><br>الإدارة تراجع التحويل (${sar(open.amount)})، ويوصلك إشعار بعد التأكيد.`}</div>${hist}`;
+  if (!paySheet) return `<button class="btn btn-orange" style="margin-top:10px" id="payBtn" type="button">دفع أو تجديد</button>${hist}`;
+  const total = payTotal();
+  return `<div style="margin-top:12px;display:flex;flex-direction:column;gap:12px">
+    <div>${ITEMS.map(([key,l]) => `<div class="item"><label><input type="checkbox" data-item="${key}" ${payItems[key]?'checked':''}>${l}${key==='uniform'?' <select id="uSize" class="search" style="width:auto;padding:2px 6px;font-size:12px" aria-label="المقاس"><option>S</option><option selected>M</option><option>L</option><option>XL</option></select>':''}</label><span class="num">${sar(DB.prices[key])}</span></div>`).join('')}
+      <div class="total"><span>المجموع</span><span class="num">${sar(total)}</span></div></div>
+    <div><strong style="font-size:14px">طريقة الدفع</strong><div class="methods" style="margin-top:6px">${METHODS.map(m => `<button type="button" class="method" data-method="${m.k}" aria-pressed="${payMethod===m.k}"><strong>${m.k}</strong><span class="label">${m.s}</span></button>`).join('')}</div></div>
+    ${payMethod==='تحويل بنكي' ? `<div class="card" style="background:var(--soft);display:flex;flex-direction:column;gap:6px"><span class="label">حوّل على حساب النادي:</span><span>[اسم البنك] · [اسم الحساب]</span><span class="iban">SA00 0000 0000 0000 0000 0000</span><label class="btn btn-ghost btn-sm" for="rcpt" style="cursor:pointer;align-self:flex-start">إرفاق صورة الإيصال</label><input type="file" id="rcpt" accept="image/*,.pdf" hidden><span class="label" id="rcptName">ما تم إرفاق إيصال</span></div>` : ''}
+    ${payMethod==='كاش في الفرع' ? `<p class="label" style="margin:0">بيطلع لك رقم طلب تعرضه لمشرف الفرع وقت الدفع، وتستلم إيصال إلكتروني بعدها.</p>` : ''}
+    <div id="payErr" class="err" hidden></div>
+    <div class="row"><button class="btn btn-orange" type="button" id="payGo" ${total?'':'disabled'}>${payMethod==='كاش في الفرع' ? 'إنشاء طلب دفع كاش' : payMethod==='تحويل بنكي' ? 'إرسال الإيصال' : 'ادفع ' + sar(total)}</button><button class="btn btn-ghost" type="button" id="payCancel">إلغاء</button></div>
+  </div>`;
+}
+
+let payFilter = 'all', payMsgAdmin = '';
+S.payments = () => {
+  const conf = DB.payments.filter(x => x.status === 'مؤكد');
+  const by = m => conf.filter(x => m.includes(x.method)).reduce((a,x) => a + x.amount, 0);
+  const sum = conf.reduce((a,x) => a + x.amount, 0);
+  const waiting = DB.payments.filter(x => x.status === 'بانتظار التأكيد' || x.status === 'بانتظار الدفع');
+  const cashToday = conf.filter(x => x.method==='كاش' && x.w.startsWith('اليوم') || x.method==='كاش' && x.w==='الآن');
+  const pname = id => DB.players.find(p => p.id === id)?.n || '';
+  const list = DB.payments.filter(x => payFilter==='all' || x.method===payFilter || (payFilter==='open' && x.status!=='مؤكد'));
+  return `
+  <section class="screen">
+    ${payMsgAdmin ? `<div class="toast">${payMsgAdmin}</div>` : ''}
+    <div class="card"><div class="row between"><h3>المحصّل هذا الشهر</h3><b class="num" style="font-family:var(--display);font-weight:400;font-size:22px;color:var(--orange)">${sar(sum)}</b></div>
+      <div class="grid2" style="margin-top:10px">
+        <div class="mtile"><span class="label">كاش</span><b class="num">${sar(by(['كاش']))}</b></div>
+        <div class="mtile"><span class="label">شبكة (مدى)</span><b class="num">${sar(by(['شبكة (مدى)','مدى / بطاقة']))}</b></div>
+        <div class="mtile"><span class="label">Apple Pay</span><b class="num">${sar(by(['Apple Pay']))}</b></div>
+        <div class="mtile"><span class="label">تحويل بنكي</span><b class="num">${sar(by(['تحويل بنكي']))}</b></div>
+      </div></div>
+
+    <div class="card"><div class="row between"><h3>تحتاج إجراء</h3><span class="chip ${waiting.length?'warn':'ok'} num">${ar(waiting.length)}</span></div>
+      <div style="margin-top:6px">${waiting.length ? waiting.map(x => `<div class="list-row" style="flex-wrap:wrap"><div><strong>${esc(pname(x.pid))}</strong><div class="label">${sar(x.amount)} · ${x.items.join('، ')} · ${x.w}</div>
+        <div class="label">${x.status==='بانتظار التأكيد' ? `تحويل بنكي · الإيصال: ${esc(x.receipt)}` : `كاش في الفرع · رقم الطلب <span class="iban">${x.code}</span>`}</div></div>
+        <div class="row" style="gap:6px">${x.status==='بانتظار التأكيد' ? `<button class="btn btn-orange btn-sm" type="button" data-confirm="${x.id}">تأكيد التحويل</button><button class="btn btn-ghost btn-sm" type="button" data-reject="${x.id}">رفض</button>` : `<button class="btn btn-orange btn-sm" type="button" data-confirm="${x.id}">استلمت الكاش</button>`}</div></div>`).join('') : '<p class="label" style="margin:0">ما فيه شي معلّق.</p>'}</div></div>
+
+    <div class="card"><h3 style="margin-bottom:4px">تسجيل دفعة في الفرع</h3>
+      <p class="label" style="margin:0 0 10px">للي يدفع كاش أو شبكة عند المشرف. يوصل لولي الأمر إيصال إلكتروني فوراً.</p>
+      <form id="recForm" novalidate style="gap:10px">
+        <div class="field"><label for="recP">اللاعب</label><select id="recP">${DB.players.map(p => `<option value="${p.id}">${esc(p.n)} · ${p.b}</option>`).join('')}</select></div>
+        <div>${[['renew','تجديد شهري'],['new','اشتراك جديد'],['uniform','بدلة'],['socks','شراريب']].map(([k,l]) => `<div class="item"><label><input type="checkbox" class="recItem" value="${k}" ${k==='renew'?'checked':''}>${l}</label><span class="num">${sar(DB.prices[k])}</span></div>`).join('')}</div>
+        <div class="field"><label for="recM">طريقة الدفع</label><select id="recM"><option>كاش</option><option>شبكة (مدى)</option><option>تحويل بنكي</option></select></div>
+        <div id="recErr" class="err" hidden>اختر شي واحد على الأقل.</div>
+        <button class="btn btn-orange" type="submit">تسجيل وإرسال الإيصال</button>
+      </form></div>
+
+    <div class="card"><div class="row between"><h3>سجل المدفوعات</h3>
+      <select class="search" id="payFilter" style="width:auto;padding:5px 8px;font-size:12px" aria-label="تصفية"><option value="all">الكل</option><option value="open" ${payFilter==='open'?'selected':''}>المعلّق</option>${['كاش','شبكة (مدى)','Apple Pay','مدى / بطاقة','تحويل بنكي'].map(m=>`<option ${payFilter===m?'selected':''}>${m}</option>`).join('')}</select></div>
+      <div style="margin-top:6px">${list.map(x => `<div class="list-row"><div><strong>${esc(pname(x.pid))}</strong><div class="label">#${ar(x.id)} · ${x.items.join('، ')} · ${x.w} · سجّلها: ${esc(x.by)}</div></div>
+        <div style="text-align:left;flex:none"><div class="num" style="font-weight:800">${sar(x.amount)}</div><span class="chip ${x.status==='مؤكد'?methodChip(x.method):statusChip(x.status)}">${x.status==='مؤكد'?x.method:x.status}</span></div></div>`).join('') || '<p class="label" style="margin:0">ما فيه نتائج.</p>'}</div></div>
+
+    <p class="note">كل دفعة كاش يسجلها المشرف باسمه، وتطلع في تقرير الصندوق اليومي لكل فرع.</p>
+  </section>`;
+};
+
+// ---- Coach
+const myPlayers = () => DB.players.filter(p => p.coach === me.id);
+let attState = {};
+S.team = () => {
+  const c = DB.coaches.find(c => c.id === me.id), ps = myPlayers();
+  ps.forEach(p => { if (!attState[p.id]) attState[p.id] = 'p'; });
+  const present = ps.filter(p => attState[p.id] !== 'a').length;
+  return `
+  <section class="screen">
+    <div class="card"><div class="row between"><div><h3>${esc(c.n)}</h3><div class="label">فرع ${c.b} · ${c.cats}</div></div><span class="chip ok num">${ar(ps.length)} لاعب</span></div></div>
+    ${c.inbox.length ? `<div class="card"><h3 style="margin-bottom:6px">تنبيهات</h3>${notifHtml(c.inbox)}</div>` : ''}
+    <div class="card">
+      <div class="row between"><div><h3>تحضير اليوم</h3><div class="label">الأحد ١٦ نوفمبر · ٥:٠٠ م</div></div><span class="chip ok num">${ar(present)} / ${ar(ps.length)}</span></div>
+      <div id="attList" style="margin-top:8px">${ps.map(p => `<div class="att"><div style="min-width:0"><span>${esc(p.n)}</span><div class="label">حضور ${ar(attRate(p.att))}٪</div></div>
+        <div class="seg" role="group" aria-label="${esc(p.n)}">${[['p','حاضر'],['l','متأخر'],['a','غائب']].map(([v,l]) => `<button type="button" class="${v}" data-p="${p.id}" data-v="${v}" aria-pressed="${attState[p.id]===v}">${l}</button>`).join('')}</div></div>`).join('')}</div>
+      <button class="btn btn-orange" id="saveAtt" type="button" style="margin-top:12px;width:100%">حفظ وإرسال إشعار للأهالي</button>
+      <div id="attMsg" class="toast" style="margin-top:10px" hidden></div>
+    </div>
+    ${coachWeekCard()}
+    <p class="note">تشوف لاعبي فريقك فقط. نقل اللاعبين بين الفرق من صلاحيات الإدارة.</p>
+  </section>`;
+};
+let rateSel = null;
+S.rate = () => {
+  const ps = myPlayers();
+  if (!ps.find(p => p.id === rateSel)) rateSel = ps[0]?.id;
+  const p = ps.find(p => p.id === rateSel);
+  if (!p) return `<section class="screen"><div class="card">ما عندك لاعبين حالياً.</div></section>`;
+  return `
+  <section class="screen"><div class="card">
+    <h3>تقييم لاعب</h3>
+    <div class="field" style="margin-top:10px"><label for="ratePlayer">اللاعب (من فريقك فقط)</label><select id="ratePlayer">${ps.map(x => `<option value="${x.id}" ${x.id===p.id?'selected':''}>${esc(x.n)}</option>`).join('')}</select></div>
+    <div id="rateList" style="display:flex;flex-direction:column;gap:10px;margin-top:12px">${SKILLS.map((k,j) => `<div class="rate"><label for="r${j}">${k}</label><input type="range" id="r${j}" min="0" max="100" value="${p.skills[k]}" data-k="${k}"><span class="num label" id="rv${j}">${ar(p.skills[k])}</span></div>`).join('')}</div>
+    <div class="field" style="margin-top:10px"><label for="rateNote">ملاحظة لولي الأمر</label><input id="rateNote" value="${esc(p.note)}" placeholder="مثلاً: ممتاز في الضغط، يحتاج يرفع رأسه وقت التمرير"></div>
+    <button class="btn btn-orange" id="saveRate" type="button" style="margin-top:12px;width:100%">حفظ التقييم</button>
+    <div id="rateMsg" class="toast" style="margin-top:10px" hidden></div>
+  </div></section>`;
+};
+
+// ---- Messages (parent & coach)
+S.messages = () => me.type==='parent' ? parentMessages() : coachMessages();
+function parentMessages(){
+  if (!DB.parents[me.phone].consent) { tab='kids'; return S.kids(); }
+  const kids = DB.players.filter(p => p.parent === me.phone);
+  if (!kids.find(k => k.id === kidSel)) kidSel = kids[0]?.id;
+  const k = kids.find(k => k.id === kidSel); if (!k) return '<section class="screen"><div class="card">ما فيه لاعبين مرتبطين برقمك.</div></section>';
+  thread(k.id).unread.parent = 0;
+  return `<section class="screen">
+    ${msgToast ? `<div class="toast">${msgToast}</div>` : ''}
+    ${kids.length > 1 ? `<div class="kids" role="group" aria-label="اختر الابن">${kids.map(x => `<button type="button" data-kid="${x.id}" aria-pressed="${x.id===k.id}">${esc(x.n.split(' ')[0])}${DB.threads[x.id]?.unread.parent ? ` <span class="badge num">${ar(DB.threads[x.id].unread.parent)}</span>` : ''}</button>`).join('')}</div>` : ''}
+    <div class="card">
+      <div class="row between"><div><h3>${k.coach ? esc(coachName(k.coach)) : 'بدون مدرب حالياً'}</h3><div class="label">مدرب ${esc(k.n.split(' ')[0])} · ${k.cat}</div></div></div>
+      <p class="label" style="margin:6px 0 10px">المحادثة داخل التطبيق ورقم المدرب الشخصي ما يظهر. المدرب يرد في أوقات العمل، والإدارة تقدر تطلع على المحادثة إذا انرفعت لها.</p>
+      ${k.coach ? `<div class="msgs" id="msgs">${bubbles(k.id,'parent')}</div>
+      <form class="composer" id="sendForm"><input id="msgIn" placeholder="اكتب رسالتك للمدرب" aria-label="الرسالة" autocomplete="off"><button class="btn btn-orange" type="submit">إرسال</button></form>` : '<p class="label">بيتم تعيين مدرب قريباً.</p>'}
+    </div>
+    <div class="card">
+      <h3 style="margin-bottom:4px">تواصل مع الإدارة</h3>
+      <p class="label" style="margin:0 0 10px">للشكاوى والاقتراحات أو أي شي ما تبي ترسله للمدرب مباشرة. توصل للإدارة بس.</p>
+      <form id="ticketForm" novalidate style="gap:10px">
+        <div class="field"><label for="tkType">النوع</label><select id="tkType"><option>استفسار</option><option>شكوى</option><option>اقتراح</option><option>طلب نقل لفريق ثاني</option></select></div>
+        <div class="field"><label for="tkText">التفاصيل</label><textarea id="tkText" placeholder="اكتب التفاصيل"></textarea></div>
+        <div id="tkErr" class="err" hidden>اكتب التفاصيل.</div>
+        <button class="btn btn-ghost" type="submit">إرسال للإدارة</button>
+      </form>
+    </div>
+  </section>`;
+}
+function coachMessages(){
+  const ps = myPlayers();
+  if (msgView && ps.find(p => p.id === msgView)) {
+    const p = ps.find(p => p.id === msgView); thread(p.id).unread.coach = 0;
+    return `<section class="screen">
+      ${msgToast ? `<div class="toast">${msgToast}</div>` : ''}
+      <div class="card">
+        <div class="row between"><div><h3>${esc(DB.parents[p.parent]?.n || 'ولي الأمر')}</h3><div class="label">ولي أمر ${esc(p.n)}</div></div><button class="btn btn-ghost btn-sm" type="button" id="backThreads">رجوع</button></div>
+        <div class="msgs" id="msgs" style="margin-top:10px">${bubbles(p.id,'coach')}</div>
+        <form class="composer" id="sendForm"><input id="msgIn" placeholder="اكتب رسالتك لولي الأمر" aria-label="الرسالة" autocomplete="off"><button class="btn btn-orange" type="submit">إرسال</button></form>
+        <button class="linkbtn" type="button" id="escalate" style="margin-top:12px">رفع المحادثة للإدارة</button>
+      </div></section>`;
+  }
+  msgView = null;
+  const withMsgs = ps.filter(p => thread(p.id).msgs.length).sort((a,b) => thread(b.id).unread.coach - thread(a.id).unread.coach);
+  return `<section class="screen">
+    ${msgToast ? `<div class="toast">${msgToast}</div>` : ''}
+    <div class="card"><div class="row between"><h3>المحادثات</h3><span class="label">أهالي فريقك فقط</span></div>
+      <div style="margin-top:6px">${withMsgs.length ? withMsgs.map(p => { const th = thread(p.id), last = th.msgs[th.msgs.length-1]; return `<button type="button" class="thread" data-thread="${p.id}"><span><strong>${esc(DB.parents[p.parent]?.n || 'ولي الأمر')}</strong> <span class="label" style="display:inline">· ${esc(p.n.split(' ')[0])}</span><span class="label ellip">${last.from==='coach'?'أنت: ':''}${esc(last.t)}</span></span>${th.unread.coach ? `<span class="badge num">${ar(th.unread.coach)}</span>` : `<span class="label">${last.w}</span>`}</button>`; }).join('') : '<p class="label" style="margin:0">ما فيه محادثات.</p>'}</div>
+      <div class="row" style="margin-top:10px;flex-wrap:nowrap"><select class="search" id="newThread" aria-label="مراسلة ولي أمر">${ps.map(p=>`<option value="${p.id}">ولي أمر ${esc(p.n)}</option>`).join('')}</select><button class="btn btn-ghost btn-sm" type="button" id="openNew">مراسلة</button></div>
+    </div>
+    <div class="card">
+      <h3 style="margin-bottom:4px">بلاغ للإدارة</h3>
+      <p class="label" style="margin:0 0 10px">سلوك لاعب، غياب متكرر، إصابة، أو شكوى من ولي أمر. يوصل للإدارة بس، وما يشوفه ولي الأمر.</p>
+      <form id="ticketForm" novalidate style="gap:10px">
+        <div class="grid2">
+          <div class="field"><label for="tkAbout">اللاعب</label><select id="tkAbout"><option value="">بدون لاعب محدد</option>${ps.map(p=>`<option>${esc(p.n)}</option>`).join('')}</select></div>
+          <div class="field"><label for="tkType">النوع</label><select id="tkType"><option>سلوك لاعب</option><option>غياب متكرر</option><option>إصابة</option><option>شكوى من ولي أمر</option><option>طلب أدوات أو ملعب</option><option>أخرى</option></select></div>
+        </div>
+        <div class="field"><label for="tkText">التفاصيل</label><textarea id="tkText" placeholder="وش صار، ومتى، ووش تقترح"></textarea></div>
+        <div id="tkErr" class="err" hidden>اكتب التفاصيل.</div>
+        <button class="btn btn-ghost" type="submit">إرسال للإدارة</button>
+      </form>
+    </div>
+  </section>`;
+}
+
+// ---- Awards
+const pn = id => DB.players.find(p => p.id === id);
+const firstName = n => n.split(' ')[0];
+const weekAwards = () => DB.awards.filter(a => a.type==='week' && a.label===DB.week);
+const lastMonthAwards = () => { const m = DB.awards.filter(a => a.type==='month'); const lab = m.length ? m[m.length-1].label : null; return m.filter(a => a.label===lab); };
+const honorName = p => (DB.parents[p.parent]?.honor || (me.type==='parent' && me.phone===p.parent) || me.type==='admin') ? esc(p.n) : '<span class="label" style="color:inherit">لاعب من الفريق (الاسم مخفي بطلب ولي الأمر)</span>';
+function honorBoard(){
+  if (me.type==='guest') return `<div class="card lock">${lockIc}<div><strong>لوحة الشرف</strong><div class="label">أفضل لاعب في الأسبوع ولاعب الشهر يظهرون لأهالي النادي ومدربيه بعد تسجيل الدخول.</div></div></div>`;
+  const months = lastMonthAwards(), weeks = DB.awards.filter(a => a.type==='week').slice(-3).reverse();
+  const thisWeek = weekAwards();
+  return `
+    ${months.length ? `<div class="card potm"><div class="row between"><h3>لاعب الشهر · ${months[0].label}</h3><span style="font-size:22px">🏆</span></div>
+      ${months.map(a => { const p = pn(a.pid); return p ? `<div class="honor" style="border-color:rgba(255,255,255,.25)"><span class="medal gold">🏆</span><div><strong>${honorName(p)}</strong><div class="label">فئة ${esc(catOf(a))} · فريق ${esc(coachName(a.coach))} · ${esc(a.reason)}</div></div></div>` : ''; }).join('')}</div>` : ''}
+    <div class="card"><div class="row between"><h3>ميداليات الأسبوع</h3><span class="label">${thisWeek.length ? DB.week : 'الأسبوع الماضي'}</span></div>
+      ${(thisWeek.length ? thisWeek : DB.awards.filter(a => a.type==='week' && a.label==='الأسبوع الثاني · نوفمبر')).map(a => { const p = pn(a.pid); return p ? `<div class="honor"><span class="medal">🏅</span><div><strong>${honorName(p)}</strong><div class="label">فريق ${esc(coachName(a.coach))} · ${esc(a.reason)}</div></div></div>` : ''; }).join('')}</div>`;
+}
+function playerAwardsCard(k){
+  const mine = DB.awards.filter(a => a.pid === k.id);
+  const wk = mine.filter(a => a.type==='week').length, mo = mine.filter(a => a.type==='month').length;
+  const par = DB.parents[k.parent];
+  return `<div class="card"><div class="row between"><h3>الإنجازات</h3><span class="label num">🏅 ${ar(wk)} · 🏆 ${ar(mo)}</span></div>
+    ${mine.length ? mine.slice().reverse().map(a => `<div class="honor"><span class="medal ${a.type==='month'?'gold':''}">${a.type==='month'?'🏆':'🏅'}</span><div><strong>${a.type==='month'?'لاعب الشهر':'أفضل لاعب في الأسبوع'}</strong><div class="label">${esc(a.label)} · ${esc(a.reason)}</div></div></div>`).join('') : '<p class="label" style="margin:6px 0 0">ما فيه ميداليات للحين. كل أسبوع فيه فرصة!</p>'}
+    <label class="row" style="gap:8px;font-size:13px;flex-wrap:nowrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--line)"><input type="checkbox" id="honorToggle" ${par.honor?'checked':''} style="flex:none"><span>أوافق على ظهور اسم ابني في لوحة الشرف لأهالي النادي إذا فاز</span></label></div>`;
+}
+function catOf(a){ return a.cat || pn(a.pid)?.cat || ''; }
+const medalsInMonth = id => DB.awards.filter(a => a.type==='week' && a.pid===id && a.label.includes(DB.month)).length;
+function myGroups(){ const g = {}; myPlayers().forEach(p => (g[p.cat] = g[p.cat] || []).push(p)); return Object.entries(g).sort(); }
+function coachWeekCard(){
+  const groups = myGroups();
+  if (!groups.length) return '';
+  return groups.map(([cat, ps], gi) => {
+    const wk = DB.awards.find(a => a.type==='week' && a.label===DB.week && a.coach===me.id && catOf(a)===cat);
+    const mo = DB.awards.find(a => a.type==='month' && a.label===DB.month && a.coach===me.id && catOf(a)===cat);
+    const cnt = id => DB.awards.filter(a => a.type==='week' && a.pid===id).length;
+    const cands = ps.slice().sort((x,y) => (medalsInMonth(y.id) - medalsInMonth(x.id)) || (attRate(y.att) - attRate(x.att)));
+    const done = (a, gold, title) => { const p = pn(a.pid); return `<div class="honor"><span class="medal ${gold?'gold':''}">${gold?'🏆':'🏅'}</span><div><strong>${esc(p?.n)}</strong><div class="label">${title} · ${esc(a.reason)}</div></div><span class="chip ok">معتمد</span></div>`; };
+    return `<div class="card"><div class="row between"><h3>جوائز فئة ${cat}</h3><span class="label num">${ar(ps.length)} لاعب</span></div>
+      <div class="ticket"><strong>🏅 أفضل لاعب في الأسبوع</strong><span class="label">${DB.week}</span>
+        ${wk ? done(wk, false, DB.week) : `<form class="awForm" data-type="week" data-cat="${cat}" novalidate style="gap:8px">
+          <select class="search" name="pid" aria-label="لاعب الأسبوع لفئة ${cat}">${ps.map(p => `<option value="${p.id}">${esc(p.n)}${cnt(p.id) ? ' · 🏅 ' + ar(cnt(p.id)) : ''}</option>`).join('')}</select>
+          <select class="search" name="reason" aria-label="السبب"><option>أفضل أداء في التمارين</option><option>روح رياضية وتعاون</option><option>تطور ملحوظ</option><option>التزام كامل بالحضور</option><option>أفضل أداء في المباراة</option></select>
+          <button class="btn btn-orange btn-sm" type="submit">اعتماد ميدالية الأسبوع</button></form>`}</div>
+      <div class="ticket"><strong>🏆 لاعب الشهر</strong><span class="label">${DB.month} · المرشحين مرتبين حسب ميداليات الأسبوع هالشهر والحضور</span>
+        ${mo ? done(mo, true, 'لاعب شهر ' + DB.month) : `<form class="awForm" data-type="month" data-cat="${cat}" novalidate style="gap:8px">
+          <select class="search" name="pid" aria-label="لاعب الشهر لفئة ${cat}">${cands.map(p => `<option value="${p.id}">${esc(p.n)} · 🏅 ${ar(medalsInMonth(p.id))} · حضور ${ar(attRate(p.att))}٪</option>`).join('')}</select>
+          <select class="search" name="reason" aria-label="السبب"><option>الأكثر تميزاً هالشهر</option><option>أكثر لاعب تطور</option><option>التزام كامل وروح قيادية</option><option>أفضل أداء في المباريات</option></select>
+          <button class="btn btn-orange btn-sm" type="submit">اعتماد لاعب الشهر</button></form>`}</div>
+      <p class="label" style="margin:6px 0 0">بعد الاعتماد يوصل إشعار لولي الأمر، والاسم يطلع في لوحة الشرف إذا وافق أهله.</p>
+    </div>`;
+  }).join('');
+}
+let monthMsg = '';
+function adminMonthCard(){
+  const groups = [];
+  DB.coaches.forEach(c => { const g = {}; DB.players.filter(p => p.coach===c.id).forEach(p => g[p.cat] = 1); Object.keys(g).sort().forEach(cat => groups.push({c, cat})); });
+  const find = (type, label, c, cat) => DB.awards.find(a => a.type===type && a.label===label && a.coach===c.id && catOf(a)===cat);
+  const pending = groups.filter(g => !find('week', DB.week, g.c, g.cat) || !find('month', DB.month, g.c, g.cat));
+  const cell = a => a ? `<span>${esc(firstName(pn(a.pid)?.n || ''))}</span>` : '<span class="chip warn">لم يُختر</span>';
+  return `<div class="card"><div class="row between"><h3>الجوائز</h3><span class="label">يختارها مدرب كل فئة</span></div>
+    ${monthMsg ? `<div class="toast" style="margin-top:8px">${monthMsg}</div>` : ''}
+    <div class="tbl-wrap" style="margin-top:6px"><table class="t"><thead><tr><th>المدرب · الفئة</th><th>🏅 الأسبوع</th><th>🏆 ${DB.month}</th></tr></thead><tbody>
+      ${groups.map(g => `<tr><td>${esc(g.c.n)}<div class="label">${g.cat} · ${g.c.b}</div></td><td>${cell(find('week', DB.week, g.c, g.cat))}</td><td>${cell(find('month', DB.month, g.c, g.cat))}</td></tr>`).join('')}
+    </tbody></table></div>
+    ${pending.length ? `<button class="btn btn-ghost btn-sm" type="button" id="remindAwards" style="margin-top:10px">تذكير المدربين اللي ما اختاروا (${ar(new Set(pending.map(g=>g.c.id)).size)})</button>` : ''}
+  </div>`;
+}
+
+// ---- Billing & support access (admin)
+const activePlayers = () => DB.players.filter(p => p.sub.st !== 'bad').length;
+const bill = () => Math.max(300, activePlayers() * 3);
+function supportCard(full){
+  const sp = DB.support, req = sp.requests.filter(r => r.status === 'بانتظار الموافقة');
+  if (!full && !req.length && !sp.active) return '';
+  return `<div class="card">
+    <div class="row between"><h3>وصول الدعم الفني</h3><span class="chip ${sp.active?'warn':'ok'}">${sp.active ? 'وصول مفتوح' : 'مقفل'}</span></div>
+    <p class="label" style="margin:6px 0 8px">مقدّم الخدمة التقنية ما يقدر يشوف بيانات اللاعبين والأهالي إلا إذا وافقت الإدارة، ولمدة محددة. وكل وصول ينسجل هنا.</p>
+    ${sp.active ? `<div class="toast"><strong>وصول مفتوح لمدة ${ar(sp.active.hours)} ساعة</strong><br>${esc(sp.active.reason)}<div class="row" style="margin-top:8px"><button class="btn btn-orange btn-sm" type="button" id="endAccess">إنهاء الوصول الآن</button></div></div>` : ''}
+    ${req.map(r => `<div class="transfer"><strong>طلب وصول من مقدّم الخدمة · ${ar(r.hours)} ساعة</strong><div style="font-size:14px">${esc(r.reason)}</div><div class="label">${r.w}</div>
+      <div class="row"><button class="btn btn-orange btn-sm" type="button" data-sp-ok="${r.id}">موافقة لمدة ${ar(r.hours)} ساعة</button><button class="btn btn-ghost btn-sm" type="button" data-sp-no="${r.id}">رفض</button></div></div>`).join('')}
+    ${full ? `<strong style="font-size:14px;display:block;margin-top:10px">سجل الوصول</strong>${sp.log.length ? sp.log.map(l => `<div class="list-row"><div><span>${esc(l.t)}</span><div class="label">${esc(l.who)} · ${l.w}</div></div></div>`).join('') : '<p class="label" style="margin:0">ما فيه وصول مسجل.</p>'}` : ''}
+  </div>`;
+}
+function billingCard(){
+  const n = activePlayers(), b = bill();
+  return `<div class="card"><div class="row between"><h3>اشتراك التطبيق</h3><span class="chip ok">شهري</span></div>
+    <div class="item" style="margin-top:6px"><span>اللاعبين النشطين آخر الشهر</span><span class="num">${ar(n)}</span></div>
+    <div class="item"><span>${ar(n)} × ٣ ريال</span><span class="num">${sar(n*3)}</span></div>
+    <div class="item"><span>الحد الأدنى</span><span class="num">${sar(300)}</span></div>
+    <div class="total"><span>فاتورة هذا الشهر</span><span class="num">${sar(b)}</span></div>
+    <div class="item" style="margin-top:8px"><span>رسائل SMS هذا الشهر</span><span class="label">تُدفع لمزود الرسائل مباشرة من حساب النادي</span></div>
+    <div class="item"><span>عمولة بوابة الدفع</span><span class="label">تُخصم عند المزود من حساب النادي</span></div>
+    <p class="label" style="margin:8px 0 0">الفاتورة تعتمد على <strong>عدد</strong> اللاعبين بس. مقدّم الخدمة ما يحتاج يشوف أسماءهم أو بياناتهم عشان يحسبها. واللاعب اللي ما جدد ما ينحسب.</p></div>`;
+}
+
+// ---- Admin
+let transferFor = null, playerFilter = 'all', playerSearch = '', lastTransfer = null;
+S.dash = () => {
+  const ps = DB.players, late = ps.filter(p => p.sub.st === 'bad');
+  const avg = Math.round(ps.reduce((a,p) => a + attRate(p.att), 0) / ps.length);
+  return `
+  <section class="screen">
+    ${supportCard(false)}
+    <div class="grid2">
+      <div class="card stat"><span class="label">اللاعبين</span><b class="num">${ar(ps.length)}</b><span class="label">في النموذج</span></div>
+      <div class="card stat"><span class="label">المدربين</span><b class="num">${ar(DB.coaches.length)}</b><span class="label">${ar(BRANCHES.length)} فروع</span></div>
+      <div class="card stat"><span class="label">نسبة الحضور</span><b class="num">${ar(avg)}٪</b><span class="label">آخر ١٠ تمارين</span></div>
+      <div class="card stat"><span class="label">طلبات جديدة</span><b class="num">${ar(DB.pending.length)}</b><span class="label">بانتظار القبول</span></div>
+    </div>
+    ${adminMonthCard()}
+    <div class="card"><h3 style="margin-bottom:6px">الفروع</h3><div class="tbl-wrap"><table class="t"><thead><tr><th>الفرع</th><th>لاعبين</th><th>مدربين</th><th>متأخر بالدفع</th></tr></thead><tbody>
+      ${BRANCHES.map(b => { const bp = ps.filter(p=>p.b===b), l = bp.filter(p=>p.sub.st==='bad').length; return `<tr><td>${b}</td><td class="num">${ar(bp.length)}</td><td class="num">${ar(DB.coaches.filter(c=>c.b===b).length)}</td><td><span class="chip ${l?'bad':'ok'} num">${ar(l)}</span></td></tr>`; }).join('')}
+    </tbody></table></div></div>
+    <div class="card"><div class="row between"><h3>البلاغات والشكاوى</h3><span class="label">من المدربين والأهالي</span></div>
+      <div style="margin-top:4px">${DB.tickets.length ? DB.tickets.map(t => `<div class="ticket">
+        <div class="row between" style="flex-wrap:nowrap;align-items:flex-start"><div style="min-width:0"><strong>#${ar(t.id)} · ${esc(t.type)}</strong><div class="label">من ${esc(t.name)} (${t.from==='coach'?'مدرب':'ولي أمر'})${t.about ? ' · بخصوص ' + esc(t.about) : ''} · ${t.w}</div></div>
+        <span class="chip ${t.status==='جديدة'?'bad':t.status==='مغلقة'?'ok':'warn'}">${t.status}</span></div>
+        <div style="font-size:14px;white-space:pre-line">${esc(t.text)}</div>
+        ${t.replies.map(r => `<div class="label">ردّ الإدارة: ${esc(r)}</div>`).join('')}
+        ${t.status!=='مغلقة' ? `<div class="composer" style="margin-top:0"><input id="rp-${t.id}" placeholder="رد على ${t.from==='coach'?'المدرب':'ولي الأمر'}" aria-label="الرد"><button class="btn btn-orange btn-sm" type="button" data-reply="${t.id}">رد</button><button class="btn btn-ghost btn-sm" type="button" data-close="${t.id}">إغلاق</button></div>` : ''}
+      </div>`).join('') : '<p class="label" style="margin:0">ما فيه بلاغات.</p>'}</div></div>
+    <div class="card"><div class="row between"><h3>طلبات التسجيل</h3><span class="label">من نموذج التطبيق</span></div>
+      <div style="margin-top:6px">${DB.pending.length ? DB.pending.map((r,i) => `<div class="list-row" style="flex-wrap:wrap"><div><strong>${esc(r.n)}</strong><div class="label">${ar(r.a)} سنوات · ${esc(r.b)} · ${r.w}</div></div>
+        <div class="row" style="gap:6px"><select class="search" style="width:auto;padding:5px 8px;font-size:12px" id="acc-${i}" aria-label="المدرب">${DB.coaches.filter(c=>c.b===r.b).concat(DB.coaches.filter(c=>c.b!==r.b)).map(c=>`<option value="${c.id}">${c.n}</option>`).join('')}</select><button class="btn btn-orange btn-sm" type="button" data-accept="${i}">قبول</button></div></div>`).join('') : '<p class="label" style="margin:0">ما فيه طلبات جديدة.</p>'}</div></div>
+    <div class="card"><div class="row between"><h3>اشتراكات متأخرة</h3></div>
+      <div style="margin-top:6px">${late.length ? late.map(p => `<div class="list-row"><div><strong>${esc(p.n)}</strong><div class="label">${p.b} · ${p.sub.label}</div></div>${p.reminded ? '<span class="chip ok">تم التذكير</span>' : `<button class="btn btn-ghost btn-sm" type="button" data-remind="${p.id}">تذكير ولي الأمر</button>`}</div>`).join('') : '<p class="label" style="margin:0">ما فيه متأخرين.</p>'}</div></div>
+  </section>`;
+};
+
+S.players = () => playersCore().replace(/<\/section>\s*$/, dataCard() + '</section>');
+const playersCore = () => {
+  const q = playerSearch.trim();
+  const list = DB.players.filter(p => (playerFilter==='all' || p.b===playerFilter || (playerFilter==='none' && !p.coach)) && (!q || p.n.includes(q)));
+  return `
+  <section class="screen">
+    ${lastTransfer ? `<div class="toast"><strong>تم نقل ${esc(lastTransfer.n)}</strong> من ${esc(lastTransfer.from)} إلى ${esc(lastTransfer.to)}.
+      <ul class="perm" style="margin-top:8px"><li><span class="y">✓</span><span>اختفى من قائمة ${esc(lastTransfer.from)}، وصار يظهر عند ${esc(lastTransfer.to)}.</span></li>
+      <li><span class="y">✓</span><span>سجل حضوره وتقييماته السابقة ينتقل معه، والمدرب الجديد يكمّل عليه.</span></li>
+      <li><span class="y">✓</span><span>وصل إشعار لولي الأمر وللمدربين الاثنين.</span></li>
+      <li><span class="y">✓</span><span>انحفظت العملية في سجل اللاعب.</span></li></ul>
+      ${lastTransfer.toId ? `<div class="row" style="margin-top:10px"><button class="btn btn-orange btn-sm" type="button" data-as-coach="${lastTransfer.toId}">شوف من حساب ${esc(lastTransfer.to)}</button>${lastTransfer.parent ? `<button class="btn btn-ghost btn-sm" type="button" data-as-parent="${lastTransfer.parent}">شوف من حساب ولي الأمر</button>` : ''}</div>` : ''}</div>` : ''}
+    <div class="card">
+      <div class="row" style="flex-wrap:nowrap">
+        <input class="search" id="pSearch" placeholder="بحث بالاسم" value="${esc(playerSearch)}" aria-label="بحث">
+        <select class="search" id="pFilter" style="width:auto" aria-label="الفرع"><option value="all">كل الفروع</option>${BRANCHES.map(b=>`<option ${playerFilter===b?'selected':''}>${b}</option>`).join('')}<option value="none" ${playerFilter==='none'?'selected':''}>بدون مدرب</option></select>
+      </div>
+      <div style="margin-top:6px">${list.map(p => `
+        <div class="list-row"><div><strong>${esc(p.n)}</strong><div class="label">${p.b} · ${p.cat} · ${p.coach ? esc(coachName(p.coach)) : '<span class="chip warn">بدون مدرب</span>'}</div></div>
+        <button class="btn ${p.coach?'btn-ghost':'btn-orange'} btn-sm" type="button" data-transfer="${p.id}">${p.coach?'نقل':'تعيين مدرب'}</button></div>
+        ${transferFor === p.id ? transferPanel(p) : ''}`).join('') || '<p class="label" style="margin:8px 0 0">ما فيه نتائج.</p>'}</div>
+    </div>
+  </section>`;
+};
+function transferPanel(p){
+  const opts = DB.coaches.filter(c => c.id !== p.coach);
+  return `<div class="transfer" id="tPanel">
+    <strong>${p.coach ? 'نقل' : 'تعيين مدرب لـ'} ${esc(p.n)}</strong>
+    <div class="from-to"><div><span class="label">من</span><br><strong>${esc(coachName(p.coach))}</strong></div><span class="arrow">←</span><div><span class="label">إلى</span><br><strong id="tToName">${esc(opts[0].n)}</strong></div></div>
+    <div class="field"><label for="tTo">المدرب الجديد</label><select id="tTo">${opts.map(c => `<option value="${c.id}">${c.n} · ${c.b} · ${c.cats}</option>`).join('')}</select></div>
+    <div class="grid2">
+      <div class="field"><label for="tReason">السبب</label><select id="tReason"><option>ترقية لفئة أعلى</option><option>تنظيم الفرق</option><option>طلب ولي الأمر</option><option>نقل لفرع ثاني</option></select></div>
+      <div class="field"><label for="tWhen">يبدأ من</label><select id="tWhen"><option>اليوم</option><option>بداية الأسبوع الجاي</option><option>بداية الشهر الجاي</option></select></div>
+    </div>
+    <div id="tBranchNote" class="label"></div>
+    <label class="row" style="gap:8px;font-size:13px;flex-wrap:nowrap"><input type="checkbox" id="tNotify" checked style="flex:none"><span>إشعار ولي الأمر والمدربين</span></label>
+    <div class="row"><button class="btn btn-orange" type="button" id="tGo">تأكيد ${p.coach?'النقل':'التعيين'}</button><button class="btn btn-ghost" type="button" id="tCancel">إلغاء</button></div>
+  </div>`;
+}
+
+S.coaches = () => `
+  <section class="screen"><div class="card">
+    <div class="row between"><h3>المدربين</h3><span class="label num">${ar(DB.coaches.length)} مدربين</span></div>
+    <div style="margin-top:6px">${DB.coaches.map(c => `<div class="list-row"><div><strong>${esc(c.n)}</strong><div class="label">${c.b} · ${c.cats}</div></div><span class="chip ${c.isNew?'warn':'ok'} num">${c.isNew ? 'وصله رابط الدخول' : ar(DB.players.filter(p=>p.coach===c.id).length) + ' لاعب'}</span></div>`).join('')}</div>
+    <form id="coachForm" novalidate style="margin-top:12px;padding-top:12px;border-top:1px solid var(--line)">
+      <strong style="font-size:14px">إضافة مدرب</strong>
+      <div class="field"><label for="c-name">الاسم</label><input id="c-name" placeholder="مثلاً: الكابتن ماجد"></div>
+      <div class="grid2"><div class="field"><label for="c-phone">الجوال</label><input id="c-phone" type="tel" dir="ltr" inputmode="tel" placeholder="05xxxxxxxx"></div>
+      <div class="field"><label for="c-branch">الفرع</label><select id="c-branch">${BRANCHES.map(b=>`<option>${b}</option>`).join('')}</select></div></div>
+      <div class="field"><label for="c-cat">الفئة</label><select id="c-cat">${CATS.map(c=>`<option ${c==='تحت ١٢'?'selected':''}>${c}</option>`).join('')}</select></div>
+      <div id="coachErr" class="err" hidden></div>
+      <button class="btn btn-ghost" type="submit">إضافة وإرسال رابط الدخول</button>
+    </form>
+  </div></section>`;
+
+let eventMsg = '';
+S.events = () => `
+  <section class="screen">
+    ${eventMsg ? `<div class="toast">${eventMsg}</div>` : ''}
+    <div class="card"><h3 style="margin-bottom:4px">إضافة فعالية</h3>
+      <p class="label" style="margin:0 0 10px">تظهر في جدول التطبيق لكل المستخدمين، ويوصل إشعار لأهالي الفرع المختار.</p>
+      <form id="evForm" novalidate>
+        <div class="field"><label for="ev-t">العنوان</label><input id="ev-t" placeholder="مثلاً: بطولة الأكاديميات الشتوية"></div>
+        <div class="grid2">
+          <div class="field"><label for="ev-type">النوع</label><select id="ev-type">${Object.keys(TYPE_CHIP).map(t=>`<option>${t}</option>`).join('')}</select></div>
+          <div class="field"><label for="ev-b">الفرع</label><select id="ev-b"><option value="الكل">كل الفروع</option>${BRANCHES.map(b=>`<option>${b}</option>`).join('')}</select></div>
+          <div class="field"><label for="ev-date">التاريخ</label><input id="ev-date" type="date" value="2026-12-05"></div>
+          <div class="field"><label for="ev-time">الوقت</label><input id="ev-time" type="time" value="16:30"></div>
+        </div>
+        <div class="field"><label for="ev-desc">التفاصيل</label><input id="ev-desc" placeholder="المكان، الزي، وقت الحضور، الرسوم إن وجدت"></div>
+        <label class="row" style="gap:8px;font-size:13px;flex-wrap:nowrap"><input type="checkbox" id="ev-notify" checked style="flex:none"><span>إرسال إشعار للأهالي والمدربين</span></label>
+        <div id="evErr" class="err" hidden></div>
+        <button class="btn btn-orange" type="submit">نشر الفعالية</button>
+      </form>
+    </div>
+    <div class="card"><div class="row between"><h3>الفعاليات المنشورة</h3><span class="label num">${ar(DB.events.length)}</span></div>
+      <div style="margin-top:6px">${DB.events.map(e => `<div class="list-row"><div><strong>${esc(e.t)}</strong><div class="label">${esc(e.type)} · ${e.d} ${ar(e.n)} ${e.m} · ${e.team ? 'أضافها ' + esc(coachName(e.team)) + ' · ' + esc(e.cat) : (e.b==='الكل'?'كل الفروع':esc(e.b))}</div></div><button class="btn btn-ghost btn-sm" type="button" data-del-ev="${e.id}">حذف</button></div>`).join('') || '<p class="label" style="margin:0">ما فيه فعاليات.</p>'}</div>
+    </div>
+  </section>`;
+
+let importResult = '';
+const dataCard = () => `
+  <div class="card">
+    <div class="row between"><h3>إضافة لاعبين من Excel</h3><span class="label">قالب النادي</span></div>
+    <p class="label" style="margin:6px 0 10px">التطبيق يتحقق من أرقام الجوالات والفروع قبل الإضافة. اللاعبين المضافين يظهرون "بدون مدرب" في قائمة اللاعبين لين تعيّن لهم مدرب.</p>
+    <div class="row"><label class="btn btn-orange" for="xlFile" style="cursor:pointer">اختيار ملف Excel</label><input type="file" id="xlFile" accept=".xlsx,.xls,.csv" hidden>
+    <button class="btn btn-ghost" id="xlSample" type="button">تجربة بملف مثال</button></div>
+    <div id="xlResult" style="margin-top:12px">${importResult}</div>
+  </div>`;
+
+// ================= Render + events =================
+function render(){
+  $('app').innerHTML = (S[tab] || S.home)();
+  bind();
+}
+function bind(){
+  const on = (id, ev, fn) => { const el = $(id); if (el) el.addEventListener(ev, fn); };
+  $('app').querySelectorAll('[data-tab]').forEach(b => b.onclick = () => go(b.dataset.tab));
+
+  // login
+  $('app').querySelectorAll('[data-acct]').forEach(b => b.onclick = () => { const a = ACCOUNTS[+b.dataset.acct]; pendingLogin = {who:a.who, phone:phoneOf(a.who)}; render(); });
+  on('loginGo','click', () => {
+    const ph = toLatin($('loginPhone').value);
+    let who = null;
+    if (DB.parents[ph]) who = {type:'parent', phone:ph};
+    // a number registered as both coach and parent gets a chooser after the code
+    const c = DB.coaches.find(c => c.phone === ph); if (c) who = {type:'coach', id:c.id};
+    if (ph === '0500000999') who = {type:'admin'};
+    if (!who) { $('loginErr').textContent = /^05\d{8}$/.test(ph) ? 'هذا الرقم مو مسجل عند النادي. إذا ابنك مسجل، تواصل مع الفرع يحدّث رقمك.' : 'اكتب رقم جوال صحيح يبدأ بـ 05.'; $('loginErr').hidden = false; return; }
+    pendingLogin = {who, phone:ph}; render();
+  });
+  on('otpGo','click', () => {
+    const ph = pendingLogin.phone, roles = rolesFor(ph);
+    if (roles.length > 1) { pendingLogin.choose = true; render(); return; }
+    const w = {...pendingLogin.who, phone:ph}; pendingLogin = null; login(w);
+  });
+  $('app').querySelectorAll('[data-role-pick]').forEach(b => b.onclick = () => { const r = rolesFor(pendingLogin.phone).find(x => x.type === b.dataset.rolePick); pendingLogin = null; login(r); });
+  on('otpBack','click', () => { pendingLogin = null; render(); });
+  on('logout','click', () => { me = {type:'guest'}; go('home'); });
+
+  // register
+  on('regForm','submit', e => {
+    e.preventDefault();
+    const v = id => $(id).value.trim(); let msg = '';
+    if(!v('f-name')) msg = 'اكتب اسم اللاعب.';
+    else if(!v('f-age') || +v('f-age')<4 || +v('f-age')>18) msg = 'العمر لازم يكون بين ٤ و ١٨ سنة.';
+    else if(!v('f-branch')) msg = 'اختر الفرع.';
+    else if(!v('f-parent')) msg = 'اكتب اسم ولي الأمر.';
+    else if(!/^05\d{8}$/.test(toLatin(v('f-phone')))) msg = 'رقم الجوال لازم يبدأ بـ 05 ويتكون من ١٠ أرقام.';
+    else if(!$('f-consent').checked) msg = 'لازم موافقة ولي الأمر عشان نكمل التسجيل.';
+    if(msg){ $('formErr').textContent = msg; $('formErr').hidden = false; return; }
+    DB.pending.unshift({n:v('f-name'), a:+v('f-age'), b:v('f-branch'), parent:v('f-parent'), phone:toLatin(v('f-phone')), w:'الآن'});
+    e.target.hidden = true;
+    $('regDone').innerHTML = `<strong>وصلنا طلبك.</strong><br>تسجيل ${esc(v('f-name'))} في فرع ${esc(v('f-branch'))}.<br><span class="label">في النموذج: سجّل دخول كـ "مدير النادي" وبتلقى الطلب في اللوحة.</span>`;
+    $('regDone').hidden = false;
+  });
+
+  // parent
+  on('consentGo','click', () => { if (!$('consentChk').checked) { $('consentErr').hidden = false; return; } DB.parents[me.phone].consent = true; DB.parents[me.phone].honor = $('honorChk').checked; render(); });
+  on('honorToggle','change', e => { DB.parents[me.phone].honor = e.target.checked; });
+  $('app').querySelectorAll('[data-kid]').forEach(b => b.onclick = () => { kidSel = b.dataset.kid; payDone = ''; paySheet = false; render(); });
+  on('payBtn','click', () => { paySheet = true; payItems = {renew:true, uniform:false, socks:false}; payMethod = 'Apple Pay'; render(); });
+  on('payCancel','click', () => { paySheet = false; render(); });
+  $('app').querySelectorAll('[data-item]').forEach(c => c.onchange = () => { payItems[c.dataset.item] = c.checked; render(); });
+  $('app').querySelectorAll('[data-method]').forEach(b => b.onclick = () => { payMethod = b.dataset.method; render(); });
+  on('rcpt','change', e => { const f = e.target.files[0]; $('rcptName').textContent = f ? f.name : 'ما تم إرفاق إيصال'; });
+  on('payGo','click', () => {
+    const k = DB.players.find(x => x.id === kidSel), items = ITEMS.filter(([key]) => payItems[key]).map(([,l]) => l);
+    if (payItems.uniform) { const i = items.indexOf('بدلة'); items[i] = `بدلة (${$('uSize').value})`; }
+    const amount = payTotal(), id = Math.max(...DB.payments.map(x=>x.id)) + 1;
+    if (payMethod === 'تحويل بنكي') {
+      const f = $('rcpt').files[0];
+      if (!f) { $('payErr').textContent = 'أرفق صورة إيصال التحويل عشان الإدارة تقدر تتأكد.'; $('payErr').hidden = false; return; }
+      DB.payments.unshift({id, pid:k.id, items, amount, method:'تحويل بنكي', status:'بانتظار التأكيد', by:'ولي الأمر', w:'الآن', receipt:f.name});
+      payDone = `<strong>وصل إيصال التحويل.</strong><br>الإدارة بتراجعه، ويوصلك إشعار بعد التأكيد.`;
+    } else if (payMethod === 'كاش في الفرع') {
+      const code = String(1000 + Math.floor(Math.random()*9000));
+      DB.payments.unshift({id, pid:k.id, items, amount, method:'كاش', status:'بانتظار الدفع', by:'ولي الأمر', w:'الآن', code});
+      payDone = '';
+    } else {
+      const pay = {id, pid:k.id, items, amount, method:payMethod, status:'مؤكد', by:'ولي الأمر', w:'الآن'};
+      DB.payments.unshift(pay); markPaid(k, items); receiptNotif(pay);
+      payDone = `<strong>تم الدفع بنجاح.</strong><br>${sar(amount)} عن طريق ${payMethod}، ووصلك الإيصال في الإشعارات.<div class="label">في النموذج ما يتم خصم أي مبلغ فعلي.</div>`;
+    }
+    paySheet = false; render();
+  });
+  // awards
+  $('app').querySelectorAll('.awForm').forEach(f => f.onsubmit = e => {
+    e.preventDefault();
+    const type = f.dataset.type, cat = f.dataset.cat, p = pn(f.elements.pid.value), reason = f.elements.reason.value;
+    DB.awards.push({type, pid:p.id, coach:me.id, cat, label: type==='week' ? DB.week : DB.month, reason, w:'اليوم'});
+    p.notifs.unshift(type==='week'
+      ? {c:'var(--orange)', i:'🏅', t:`مبروك! ${firstName(p.n)} أفضل لاعب في فئة ${cat} هالأسبوع (${reason}). الميدالية تتسلم في نهاية الأسبوع.`, w:'الآن'}
+      : {c:'var(--orange)', i:'🏆', t:`ألف مبروك! ${firstName(p.n)} لاعب شهر ${DB.month} في فئة ${cat} (${reason}). يتسلم الجائزة في نهاية الشهر.`, w:'الآن'});
+    render();
+  });
+  on('remindAwards','click', () => {
+    const ids = new Set();
+    DB.coaches.forEach(c => { DB.players.filter(p => p.coach===c.id).forEach(p => {
+      const has = t => DB.awards.find(a => a.type===t && a.coach===c.id && catOf(a)===p.cat && a.label===(t==='week'?DB.week:DB.month));
+      if (!has('week') || !has('month')) ids.add(c.id); }); });
+    ids.forEach(id => DB.coaches.find(c => c.id===id).inbox.unshift({c:'var(--orange)', i:'🏅', t:'تذكير من الإدارة: اختر لاعب الأسبوع ولاعب الشهر لفئاتك قبل نهاية الأسبوع.', w:'الآن'}));
+    monthMsg = `وصل تذكير لـ ${ar(ids.size)} مدربين.`; render();
+  });
+
+  // support access
+  $('app').querySelectorAll('[data-sp-ok]').forEach(b => b.onclick = () => {
+    const r = DB.support.requests.find(x => x.id === +b.dataset.spOk); r.status = 'تمت الموافقة';
+    DB.support.active = r; DB.support.log.unshift({t:`وصول دعم فني لمدة ${ar(r.hours)} ساعة: ${r.reason}`, who:'مقدّم الخدمة · بموافقة مدير النادي', w:'اليوم · بدأ الآن'}); render();
+  });
+  $('app').querySelectorAll('[data-sp-no]').forEach(b => b.onclick = () => {
+    const r = DB.support.requests.find(x => x.id === +b.dataset.spNo); r.status = 'مرفوض';
+    DB.support.log.unshift({t:`طلب وصول مرفوض: ${r.reason}`, who:'مدير النادي', w:'اليوم'}); render();
+  });
+  on('endAccess','click', () => { DB.support.log[0].w = 'اليوم · انتهى الآن بقرار الإدارة'; DB.support.active = null; render(); });
+  // admin payments
+  const settle = (id, ok) => {
+    const x = DB.payments.find(y => y.id === id), p = DB.players.find(y => y.id === x.pid);
+    if (ok) { x.status = 'مؤكد'; x.by = 'مدير النادي'; markPaid(p, x.items); receiptNotif(x); payMsgAdmin = `تم تأكيد ${sar(x.amount)} من ${esc(p.n)}، ووصل الإيصال لولي الأمر.`; }
+    else { x.status = 'مرفوض'; p.notifs.unshift({c:'var(--bad)', i:'!', t:`ما قدرنا نأكد التحويل (${sar(x.amount)}). تأكد من الإيصال أو تواصل مع الفرع.`, w:'الآن'}); payMsgAdmin = `تم رفض التحويل، ووصل إشعار لولي أمر ${esc(p.n)}.`; }
+    render(); window.scrollTo(0,0);
+  };
+  $('app').querySelectorAll('[data-confirm]').forEach(b => b.onclick = () => settle(+b.dataset.confirm, true));
+  $('app').querySelectorAll('[data-reject]').forEach(b => b.onclick = () => settle(+b.dataset.reject, false));
+  on('payFilter','change', e => { payFilter = e.target.value; payMsgAdmin = ''; render(); });
+  on('recForm','submit', e => {
+    e.preventDefault();
+    const keys = [...$('app').querySelectorAll('.recItem:checked')].map(c => c.value);
+    if (!keys.length) { $('recErr').hidden = false; return; }
+    const names = {renew:'تجديد شهري', new:'اشتراك جديد', uniform:'بدلة', socks:'شراريب'};
+    const p = DB.players.find(x => x.id === $('recP').value);
+    const pay = {id: Math.max(...DB.payments.map(x=>x.id)) + 1, pid:p.id, items:keys.map(k=>names[k]), amount:keys.reduce((a,k)=>a+DB.prices[k],0), method:$('recM').value, status:'مؤكد', by:'مدير النادي', w:'الآن'};
+    DB.payments.unshift(pay); markPaid(p, pay.items); receiptNotif(pay);
+    payMsgAdmin = `تم تسجيل ${sar(pay.amount)} (${pay.method}) لـ ${esc(p.n)}، ووصل الإيصال لولي الأمر.`;
+    render(); window.scrollTo(0,0);
+  });
+
+  // coach
+  on('attList','click', e => { const b = e.target.closest('button[data-p]'); if (!b) return; attState[b.dataset.p] = b.dataset.v; render(); });
+  on('saveAtt','click', () => {
+    const ps = myPlayers(), absent = [];
+    ps.forEach(p => {
+      const s = attState[p.id] || 'p';
+      p.att = (p.att + s).slice(-10);
+      if (s === 'a') { absent.push(p.n); p.notifs.unshift({c:'var(--bad)', i:'!', t:`${p.n.split(' ')[0]} غاب عن تمرين الأحد. إذا فيه عذر تواصل مع المدرب.`, w:'الآن'}); }
+      if (s === 'l') p.notifs.unshift({c:'var(--warn)', i:'⏱', t:`${p.n.split(' ')[0]} وصل متأخر لتمرين الأحد.`, w:'الآن'});
+    });
+    attState = {}; render();
+    $('attMsg').textContent = absent.length ? `تم الحفظ. وصل إشعار غياب لأهالي: ${absent.join('، ')}.` : 'تم الحفظ. كل اللاعبين حاضرين.';
+    $('attMsg').hidden = false;
+  });
+  on('ratePlayer','change', e => { rateSel = e.target.value; render(); });
+  on('rateList','input', e => { const k = e.target.dataset.k; if (k) $('rv' + e.target.id.slice(1)).textContent = ar(e.target.value); });
+  on('saveRate','click', () => {
+    const p = DB.players.find(p => p.id === rateSel);
+    $('rateList').querySelectorAll('input').forEach(i => p.skills[i.dataset.k] = +i.value);
+    p.note = $('rateNote').value.trim();
+    p.notifs.unshift({c:'var(--orange)', i:'★', t:`${coachName(me.id)} حدّث تقييم ${p.n.split(' ')[0]}.`, w:'الآن'});
+    $('rateMsg').textContent = `تم حفظ تقييم ${p.n}، ووصل إشعار لولي أمره.`; $('rateMsg').hidden = false;
+  });
+
+  // admin dashboard
+  $('app').querySelectorAll('[data-accept]').forEach(b => b.onclick = () => {
+    const i = +b.dataset.accept, r = DB.pending[i], cid = $('acc-' + i).value, c = DB.coaches.find(c=>c.id===cid);
+    if (!DB.parents[r.phone]) DB.parents[r.phone] = {n:r.parent || 'ولي أمر', consent:true, honor:true};
+    const p = mk('p' + Date.now(), r.n, r.a, c.b, r.a <= 8 ? 'تحت ٨' : r.a <= 10 ? 'تحت ١٠' : r.a <= 12 ? 'تحت ١٢' : r.a <= 14 ? 'تحت ١٤' : 'تحت ١٦', 'غير محدد', cid, r.phone);
+    p.att = ''; p.att = 'p'; p.history = [{t:`تم قبول التسجيل وانضم لفريق ${c.n}`, w:'اليوم'}];
+    p.notifs = [{c:'var(--ok)', i:'✓', t:`تم قبول تسجيل ${r.n.split(' ')[0]} في فريق ${c.n}. أهلاً فيكم!`, w:'الآن'}];
+    DB.players.push(p); DB.pending.splice(i,1);
+    c.inbox.unshift({c:'var(--ok)', i:'+', t:`لاعب جديد انضم لفريقك: ${r.n}`, w:'الآن'});
+    render();
+  });
+  $('app').querySelectorAll('[data-remind]').forEach(b => b.onclick = () => { const p = DB.players.find(p=>p.id===b.dataset.remind); p.reminded = true; p.notifs.unshift({c:'var(--warn)', i:'!', t:'تذكير: اشتراك ابنك متأخر. تقدر تجدده من التطبيق.', w:'الآن'}); render(); });
+
+  // admin players + transfer
+  on('pSearch','input', e => { playerSearch = e.target.value; const pos = e.target.selectionStart; render(); const s = $('pSearch'); s.focus(); s.setSelectionRange(pos,pos); });
+  on('pFilter','change', e => { playerFilter = e.target.value; render(); });
+  $('app').querySelectorAll('[data-transfer]').forEach(b => b.onclick = () => { transferFor = transferFor === b.dataset.transfer ? null : b.dataset.transfer; lastTransfer = null; render(); $('tPanel')?.scrollIntoView({block:'nearest'}); updateTransferPreview(); });
+  on('tTo','change', updateTransferPreview);
+  on('tCancel','click', () => { transferFor = null; render(); });
+  on('tGo','click', () => {
+    const p = DB.players.find(p => p.id === transferFor), to = DB.coaches.find(c => c.id === $('tTo').value);
+    const fromId = p.coach, fromName = coachName(fromId), reason = $('tReason').value, when = $('tWhen').value, notify = $('tNotify').checked;
+    const branchChanged = p.b !== to.b;
+    p.coach = to.id; p.b = to.b;
+    p.history.push({t:`${fromId ? 'انتقل من ' + fromName + ' إلى ' : 'تم تعيينه في فريق '}${to.n}${branchChanged ? ' (فرع ' + to.b + ')' : ''} · السبب: ${reason}`, w:`يبدأ ${when} · بواسطة مدير النادي`});
+    if (notify) {
+      p.notifs.unshift({c:'var(--orange)', i:'⇄', t:`${p.n.split(' ')[0]} صار في فريق ${to.n}${branchChanged ? ' بفرع ' + to.b : ''} ابتداءً من ${when}.`, w:'الآن'});
+      to.inbox.unshift({c:'var(--ok)', i:'+', t:`انضم لفريقك: ${p.n} (${reason}) · يبدأ ${when}`, w:'الآن'});
+      const from = DB.coaches.find(c => c.id === fromId); if (from) from.inbox.unshift({c:'var(--warn)', i:'−', t:`انتقل من فريقك: ${p.n} إلى ${to.n}`, w:'الآن'});
+    }
+    lastTransfer = {n:p.n, from:fromName, to:to.n, toId:to.id, parent:p.parent};
+    transferFor = null; render(); window.scrollTo(0,0);
+  });
+  $('app').querySelectorAll('[data-as-coach]').forEach(b => b.onclick = () => { lastTransfer = null; login({type:'coach', id:b.dataset.asCoach}); });
+  $('app').querySelectorAll('[data-as-parent]').forEach(b => b.onclick = () => { const ph = b.dataset.asParent; lastTransfer = null; DB.parents[ph].consent = true; kidSel = null; login({type:'parent', phone:ph}); });
+
+  // admin coaches
+  on('coachForm','submit', e => {
+    e.preventDefault();
+    const n = $('c-name').value.trim(), p = toLatin($('c-phone').value); let msg = '';
+    if (!n) msg = 'اكتب اسم المدرب.'; else if (!/^05\d{8}$/.test(p)) msg = 'رقم الجوال لازم يبدأ بـ 05 ويتكون من ١٠ أرقام.';
+    if (msg) { $('coachErr').textContent = msg; $('coachErr').hidden = false; return; }
+    DB.coaches.push({id:'c' + Date.now(), n, b:$('c-branch').value, cats:$('c-cat').value, phone:p, inbox:[], isNew:true});
+    render();
+  });
+
+  // messages
+  const ms = $('msgs'); if (ms) ms.scrollTop = ms.scrollHeight;
+  if (tab==='messages') { renderChrome(); }
+  on('sendForm','submit', e => {
+    e.preventDefault(); const t = $('msgIn').value.trim(); if (!t) return;
+    const pid = me.type==='parent' ? kidSel : msgView, th = thread(pid);
+    th.msgs.push({from:me.type, t, w:nowLabel()});
+    if (me.type==='parent') th.unread.coach++; else { th.unread.parent++; const p = DB.players.find(x=>x.id===pid); p.notifs.unshift({c:'var(--ok)', i:'✉', t:`رسالة جديدة من ${coachName(me.id)}.`, w:'الآن'}); }
+    msgToast = ''; render(); $('msgIn')?.focus();
+  });
+  on('backThreads','click', () => { msgView = null; msgToast = ''; render(); });
+  $('app').querySelectorAll('[data-thread]').forEach(b => b.onclick = () => { msgView = b.dataset.thread; msgToast = ''; render(); });
+  on('openNew','click', () => { msgView = $('newThread').value; msgToast = ''; render(); });
+  on('escalate','click', () => {
+    const p = DB.players.find(x=>x.id===msgView), th = thread(p.id);
+    const id = newTicket({from:'coach', name:coachName(me.id), about:p.n, type:'محادثة مرفوعة', text: th.msgs.slice(-4).map(m => `${m.from==='coach'?'المدرب':'ولي الأمر'}: ${m.t}`).join('\n') || 'بدون رسائل'});
+    th.msgs.push({from:'sys', t:`تم رفع المحادثة للإدارة (بلاغ #${ar(id)})`, w:'الآن'});
+    msgToast = `تم رفع المحادثة للإدارة. رقم البلاغ #${ar(id)}.`; render();
+  });
+  on('ticketForm','submit', e => {
+    e.preventDefault(); const text = $('tkText').value.trim();
+    if (!text) { $('tkErr').hidden = false; return; }
+    const isParent = me.type==='parent', k = isParent ? DB.players.find(x=>x.id===kidSel) : null;
+    const id = newTicket({from:me.type, name: isParent ? DB.parents[me.phone].n : coachName(me.id), about: isParent ? k?.n : $('tkAbout').value, type:$('tkType').value, text});
+    msgToast = `<strong>وصل للإدارة.</strong> رقم البلاغ #${ar(id)}، وبيوصلك إشعار لما ترد الإدارة.<div class="row" style="margin-top:8px"><button class="btn btn-orange btn-sm" type="button" data-as-admin>شوفه من حساب الإدارة</button></div>`;
+    render(); window.scrollTo(0,0);
+  });
+  $('app').querySelectorAll('[data-as-admin]').forEach(b => b.onclick = () => { msgToast = ''; login({type:'admin'}); });
+  const answer = (id, close) => {
+    const t = DB.tickets.find(x=>x.id===id), inp = $('rp-'+id), r = inp ? inp.value.trim() : '';
+    if (!r && !close) { inp?.focus(); return; }
+    if (r) t.replies.push(r);
+    t.status = close ? 'مغلقة' : 'قيد المعالجة';
+    const msg = `${close ? 'تم إغلاق' : 'رد الإدارة على'} البلاغ #${ar(id)}${r ? ': ' + r : '.'}`;
+    if (t.from==='coach') { const c = DB.coaches.find(c=>c.n===t.name); c?.inbox.unshift({c:'var(--red)', i:'#', t:msg, w:'الآن'}); }
+    else { const k = DB.players.find(p=>p.n===t.about); k?.notifs.unshift({c:'var(--red)', i:'#', t:msg, w:'الآن'}); }
+    render();
+  };
+  $('app').querySelectorAll('[data-reply]').forEach(b => b.onclick = () => answer(+b.dataset.reply, false));
+  $('app').querySelectorAll('[data-close]').forEach(b => b.onclick = () => answer(+b.dataset.close, true));
+
+  // coach matches + parent rsvp
+  on('matchForm','submit', e => {
+    e.preventDefault();
+    const opp = $('mt-opp').value.trim(), dv = $('mt-date').value, tv = $('mt-time').value || '17:00';
+    const squad = [...$('app').querySelectorAll('.sq:checked')].map(c => c.value);
+    let msg = !opp ? 'اكتب اسم الفريق الخصم.' : !dv ? 'اختر التاريخ.' : !squad.length ? 'اختر لاعب واحد على الأقل.' : '';
+    if (msg) { $('mtErr').textContent = msg; $('mtErr').hidden = false; return; }
+    const dt = new Date(dv + 'T12:00:00'), [hh, mm] = tv.split(':').map(Number);
+    const fmt = (h, m) => `${ar(((h + 11) % 12) + 1)}:${ar(String(m).padStart(2,'0'))} ${h < 12 ? 'ص' : 'م'}`;
+    const before = {'نص ساعة':30,'ساعة':60,'ساعة ونص':90}[$('mt-meet').value], mins = hh*60 + mm - before;
+    const meet = fmt(Math.floor(mins/60), mins%60), c = DB.coaches.find(c => c.id === me.id);
+    const ev = {id:'m' + Date.now(), t:`مباراة ضد ${opp}`, type:'مباراة', d:dt.toLocaleDateString('ar', {weekday:'long'}), n:dt.getDate(), m:dt.toLocaleDateString('ar', {month:'long'}), time:fmt(hh, mm), b:c.b, desc:`${$('mt-place').value.trim()} · الحضور ${meet} بالزي الرسمي`, team:me.id, cat:$('mt-cat').value, squad, rsvp:{}};
+    DB.events.push(ev);
+    squad.forEach(id => { const p = pn(id); p.notifs.unshift({c:'var(--red)', i:'⚽', t:`${firstName(p.n)} مستدعى لـ${ev.t} · ${ev.d} ${ar(ev.n)} ${ev.m} الساعة ${ev.time}، والحضور ${meet}. أكّد الحضور من الجدول.`, w:'الآن'}); });
+    matchMsg = `تم نشر ${esc(ev.t)}، ووصل إشعار لأهالي ${ar(squad.length)} لاعبين.`;
+    render(); window.scrollTo(0,0);
+  });
+  $('app').querySelectorAll('[data-del-match]').forEach(b => b.onclick = () => {
+    const ev = DB.events.find(x => x.id === b.dataset.delMatch);
+    ev.squad.forEach(id => pn(id)?.notifs.unshift({c:'var(--bad)', i:'!', t:`تم إلغاء ${ev.t} (${ev.d} ${ar(ev.n)} ${ev.m}).`, w:'الآن'}));
+    DB.events = DB.events.filter(x => x !== ev); matchMsg = 'تم إلغاء المباراة، ووصل إشعار للأهالي.'; render();
+  });
+  $('app').querySelectorAll('[data-rsvp]').forEach(b => b.onclick = () => {
+    const [eid, pid, v] = b.dataset.rsvp.split('|'), ev = DB.events.find(x => x.id === eid);
+    ev.rsvp = ev.rsvp || {};
+    if (!v) delete ev.rsvp[pid]; else {
+      ev.rsvp[pid] = v;
+      DB.coaches.find(c => c.id === ev.team)?.inbox.unshift({c: v==='yes' ? 'var(--ok)' : 'var(--bad)', i: v==='yes' ? '✓' : '✕', t:`${pn(pid).n} ${v==='yes' ? 'أكد حضوره' : 'اعتذر عن'} ${ev.t}.`, w:'الآن'});
+    }
+    render();
+  });
+
+  // admin events
+  on('evForm','submit', e => {
+    e.preventDefault();
+    const t = $('ev-t').value.trim(), dv = $('ev-date').value, tv = $('ev-time').value;
+    if (!t || !dv) { $('evErr').textContent = !t ? 'اكتب عنوان الفعالية.' : 'اختر التاريخ.'; $('evErr').hidden = false; return; }
+    const dt = new Date(dv + 'T12:00:00');
+    const [hh, mm] = (tv || '16:00').split(':').map(Number);
+    const time = `${ar(((hh + 11) % 12) + 1)}:${ar(String(mm).padStart(2,'0'))} ${hh < 12 ? 'ص' : 'م'}`;
+    const ev = {id:'e' + Date.now(), t, type:$('ev-type').value, d:dt.toLocaleDateString('ar', {weekday:'long'}), n:dt.getDate(), m:dt.toLocaleDateString('ar', {month:'long'}), time, b:$('ev-b').value, desc:$('ev-desc').value.trim()};
+    DB.events.push(ev);
+    let reached = 0;
+    if ($('ev-notify').checked) {
+      DB.players.filter(p => ev.b === 'الكل' || p.b === ev.b).forEach(p => { reached++; p.notifs.unshift({c:'var(--red)', i:'📅', t:`${ev.type} جديدة: ${ev.t} · ${ev.d} ${ar(ev.n)} ${ev.m} الساعة ${ev.time}.`, w:'الآن'}); });
+      DB.coaches.filter(c => ev.b === 'الكل' || c.b === ev.b).forEach(c => c.inbox.unshift({c:'var(--red)', i:'📅', t:`${ev.type} جديدة: ${ev.t} · ${ev.d} ${ar(ev.n)} ${ev.m}`, w:'الآن'}));
+    }
+    eventMsg = `<strong>تم نشر "${esc(t)}".</strong><br>تظهر الحين في جدول التطبيق${reached ? `، ووصل إشعار لأهالي ${ar(reached)} لاعب` : ''}.<div class="row" style="margin-top:8px"><button class="btn btn-orange btn-sm" type="button" data-as-parent="0500000001">شوفها من حساب ولي أمر</button></div>`;
+    render(); window.scrollTo(0,0);
+  });
+  $('app').querySelectorAll('[data-del-ev]').forEach(b => b.onclick = () => { DB.events = DB.events.filter(e => e.id !== b.dataset.delEv); eventMsg = ''; render(); });
+
+  // admin data import
+  on('xlFile','change', async e => {
+    const f = e.target.files[0]; if (!f) return;
+    if (typeof XLSX === 'undefined') { importResult = '<div class="err">ما قدرنا نقرأ ملفات Excel الحين. جرّب "تجربة بملف مثال".</div>'; render(); return; }
+    try {
+      const wb = XLSX.read(await f.arrayBuffer(), {type:'array', raw:false});
+      const sheet = wb.Sheets['اللاعبين'] || wb.Sheets[wb.SheetNames[0]];
+      importRows(XLSX.utils.sheet_to_json(sheet, {defval:'', raw:false}));
+    } catch(err) { importResult = '<div class="err">ما قدرنا نقرأ الملف. تأكد إنه قالب النادي بصيغة xlsx.</div>'; render(); }
+  });
+  on('xlSample','click', () => importRows([
+    {'اسم اللاعب الثلاثي':'سعد فهد العتيبي','الفرع':'الوزيرية','الفئة':'تحت ١٠','اسم ولي الأمر':'فهد العتيبي','جوال ولي الأمر':'0551112233'},
+    {'اسم اللاعب الثلاثي':'حمزة سامي الزهراني','الفرع':'الفيصلية','الفئة':'تحت ١٤','اسم ولي الأمر':'سامي الزهراني','جوال ولي الأمر':'0553334455'},
+    {'اسم اللاعب الثلاثي':'بدر سامي الزهراني','الفرع':'الفيصلية','الفئة':'تحت ١٠','اسم ولي الأمر':'سامي الزهراني','جوال ولي الأمر':'0553334455'},
+    {'اسم اللاعب الثلاثي':'عمار خالد','الفرع':'الفيصلية','الفئة':'تحت ١٦','اسم ولي الأمر':'خالد','جوال ولي الأمر':'055333'},
+    {'اسم اللاعب الثلاثي':'مهند علي','الفرع':'الشاطئ','الفئة':'تحت ١٠','اسم ولي الأمر':'علي','جوال ولي الأمر':'0554445566'},
+  ]));
+}
+function updateTransferPreview(){
+  const sel = $('tTo'); if (!sel) return;
+  const to = DB.coaches.find(c => c.id === sel.value), p = DB.players.find(p => p.id === transferFor);
+  $('tToName').textContent = to.n;
+  $('tBranchNote').textContent = p.b !== to.b ? `تنبيه: هذا المدرب في فرع ${to.b}، فبيتغير فرع اللاعب من ${p.b} إلى ${to.b}.` : '';
+}
+function importRows(rows){
+  const ok = [], bad = [];
+  rows.forEach((r, i) => {
+    const name = String(r['اسم اللاعب الثلاثي'] ?? '').trim();
+    if (!name || name.startsWith('مثال')) return;
+    let phone = toLatin(r['جوال ولي الأمر']); if (/^5\d{8}$/.test(phone)) phone = '0' + phone;
+    const branch = String(r['الفرع'] ?? '').trim(), issues = [];
+    if (!/^05\d{8}$/.test(phone)) issues.push('رقم الجوال');
+    if (!BRANCHES.includes(branch)) issues.push('الفرع');
+    if (!String(r['اسم ولي الأمر'] ?? '').trim()) issues.push('اسم ولي الأمر');
+    if (issues.length) { bad.push({row:i+2, name, issues}); return; }
+    if (!DB.parents[phone]) DB.parents[phone] = {n:String(r['اسم ولي الأمر']).trim(), consent:false};
+    const p = mk('x' + Date.now() + i, name, '', branch, r['الفئة'] || '', r['المركز'] || 'غير محدد', null, phone);
+    p.att = 'p'; p.history = [{t:'أُضيف من ملف Excel الخاص بالفرع', w:'اليوم'}]; p.notifs = [];
+    DB.players.push(p); ok.push(p);
+  });
+  importResult = `<div class="toast"><strong>تمت إضافة ${ar(ok.length)} ${ok.length===1?'لاعب':'لاعبين'}.</strong>${bad.length ? `<br>${ar(bad.length)} صفوف تحتاج تصحيح.` : ''}
+    <div class="label">اللاعبين الجدد يظهرون في "اللاعبين" تحت فلتر "بدون مدرب". وكل ولي أمر يوصله رابط الدخول، ويوافق على سياسة الخصوصية أول ما يدخل.</div>
+    ${ok.length ? '<button class="btn btn-orange btn-sm" type="button" id="toUnassigned" style="margin-top:8px">تعيين مدربين لهم</button>' : ''}</div>
+    ${bad.length ? `<div class="err" style="margin-top:10px"><strong>صفوف تحتاج تصحيح:</strong>${bad.map(b=>`<div>الصف ${ar(b.row)} · ${esc(b.name)}: ${b.issues.join('، ')}</div>`).join('')}</div>` : ''}`;
+  render();
+  const t = $('toUnassigned'); if (t) t.onclick = () => { playerFilter = 'none'; go('players'); };
+}
+
+renderChrome(); render();
+</script>
+
+<div id="expired" hidden style="position:fixed;inset:0;z-index:9999;background:#2a1d10;color:#fbf6ee;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center;font-family:Tajawal,system-ui,sans-serif">
+  <img src="icons/icon-192.png" alt="" style="width:96px;height:96px;border-radius:22px">
+  <h2 style="margin:0;font-size:22px">انتهت فترة العرض</h2>
+  <p style="margin:0;opacity:.85;max-width:320px;line-height:1.7">هذي نسخة عرض لمدة محددة. للاستمرار أو لتمديد التجربة، تواصل مع مقدّم التطبيق.</p>
+</div>
+<script>
+(function(){
+  var END = new Date('2026-12-19T23:59:59+03:00');
+  function check(){ if (new Date() > END) { var e = document.getElementById('expired'); e.hidden = false; e.style.display = 'flex'; } }
+  check(); setInterval(check, 60000);
+  document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+})();
+</script>
+</body>
+</html>
